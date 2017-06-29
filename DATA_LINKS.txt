@@ -1,0 +1,12 @@
+DATA LINK:
+-News Data
+https://github.com/WayneDW/Sentiment-Analysis-in-Event-Driven-Stock-Price-Movement-Prediction
+-Financials
+Yahoo Finance (link with demonstration) - https://www.youtube.com/watch?v=2BrpKpWwT2A&list=PLQVvvaa0QuDcOdF96TBtRtuQksErCEBYZ
+or alternatively
+https://github.com/eliangcs/pystock-data
+
+OTHER DATA LINKS: 
+https://github.com/apmoore1/semeval/blob/master/paper/lancaster-semeval-2017.pdf
+https://github.com/philipperemy/Reuters-full-data-set
+https://github.com/philipperemy/financial-news-dataset
