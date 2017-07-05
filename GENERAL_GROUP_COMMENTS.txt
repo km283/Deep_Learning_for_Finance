@@ -1,0 +1,2 @@
+POST ANY COMMENTS ABOUT THE WORK, MEETUPS & ETC HERE AS WELL AS FACEBOOK
+- Michael you are absolutely write about the loss function thing. I only put down softmax becuase I couldn't remember the acronim used in the deep learning book. 
