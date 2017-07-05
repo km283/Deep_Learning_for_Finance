@@ -1,0 +1,6 @@
+glove/*.txt
+glove/glv
+glove/__pycache__
+glove/*.csv
+lectures
+
