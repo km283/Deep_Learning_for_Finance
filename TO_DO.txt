@@ -1,3 +1,4 @@
+HOW TO LINKS PROVIDED TO THESE TASKS IN THE READ_ME OUTLINE:
 1 - Convert Headlines into word vectors 
 2 - Convert Word Vectors into Headline Vectors 
 3 - Reuse some of code from 2 to summarise headlines into headlines vector (multipleheadline summary)
