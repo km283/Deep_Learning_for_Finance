@@ -1,0 +1,8 @@
+1 - Convert Headlines into word vectors 
+2 - Convert Word Vectors into Headline Vectors 
+3 - Reuse some of code from 2 to summarise headlines into headlines vector (multipleheadline summary)
+4 - Retrieve price and volume data from yahoo finance for our companies and the relevant dates (following timestamps and ticker symbols in headline doc)
+5 - Concatenate price and volume data with relevant headlines. Write CNN 
+6 - Write RNN for price and volume data 
+7 - Merge everything through fully conected layer
+8 - Test model using hold out data 
