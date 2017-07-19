@@ -1,7 +1,7 @@
 from helper import *
 
 
-DATADIR = "/Users/udokanwosu/Documents/Junk/ParseText/Seq2Seq/datafiles/"
+DATADIR = "../data/"
 DISTINCT = DATADIR + "hl_distinct.txt"
 GLOVE = DATADIR + "glove.840B.300d.txt"
 NEWS = DATADIR + "news.csv"

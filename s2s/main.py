@@ -6,8 +6,7 @@ from helper import *
 from tensorflow.python.layers.core import Dense
 
 
-
-DATADIR = "/Users/udokanwosu/Documents/Junk/ParseText/Seq2Seq/datafiles/"
+DATADIR = "../data/"
 DISTINCT = DATADIR + "hl_distinct.txt"
 GLOVE = DATADIR + "glove.840B.300d.txt"
 NEWS = DATADIR + "news.csv"
@@ -40,18 +39,18 @@ decoding_embedding_size = 300
 learning_rate = 0.001
 
 
-
-
-
 def get_model_inputs():
     input_data = tf.placeholder(tf.int32, [None, None], name='input')
     targets = tf.placeholder(tf.int32, [None, None], name='targets')
     lr = tf.placeholder(tf.float32, name='learning_rate')
 
-    target_sequence_length = tf.placeholder(tf.int32, (None,), name='target_sequence_length')
-    max_target_sequence_length = tf.reduce_max(target_sequence_length, name='max_target_len')
-    source_sequence_length = tf.placeholder(tf.int32, (None,), name='source_sequence_length')
-    
+    target_sequence_length = tf.placeholder(
+        tf.int32, (None,), name='target_sequence_length')
+    max_target_sequence_length = tf.reduce_max(
+        target_sequence_length, name='max_target_len')
+    source_sequence_length = tf.placeholder(
+        tf.int32, (None,), name='source_sequence_length')
+
     return input_data, targets, lr, target_sequence_length, max_target_sequence_length, source_sequence_length
 
     return input_data, targets, lr, target_sequence_length. max_target_sequence_length, source_sequence_length
@@ -127,8 +126,8 @@ def decoding_layer(target_letter_to_int, decoding_embedding_size, num_layers, rn
 
         # Perform dynamic decoding using the decoder
         training_decoder_output, _, _ = tf.contrib.seq2seq.dynamic_decode(training_decoder,
-                                                                       impute_finished=True,
-                                                                       maximum_iterations=max_target_sequence_length)
+                                                                          impute_finished=True,
+                                                                          maximum_iterations=max_target_sequence_length)
     # 5. Inference Decoder
     # Reuses the same parameters trained by the training process
     with tf.variable_scope("decode", reuse=True):
@@ -148,8 +147,8 @@ def decoding_layer(target_letter_to_int, decoding_embedding_size, num_layers, rn
 
         # Perform dynamic decoding using the decoder
         inference_decoder_output, _, _ = tf.contrib.seq2seq.dynamic_decode(inference_decoder,
-                                                                        impute_finished=True,
-                                                                        maximum_iterations=max_target_sequence_length)
+                                                                           impute_finished=True,
+                                                                           maximum_iterations=max_target_sequence_length)
 
     return training_decoder_output, inference_decoder_output
 
@@ -212,65 +211,64 @@ def get_batches(targets, sources, batch_size, source_pad_int, target_pad_int):
         yield pad_targets_batch, pad_sources_batch, pad_targets_lengths, pad_source_lengths
 
 
-
-
 def main():
+    with tf.device(device):
+      train_graph = tf.Graph()
+      with train_graph.as_default():
+          input_data, targets, lr, target_sequence_length, max_target_sequence_length, source_sequence_length = get_model_inputs()
 
-    train_graph = tf.Graph()
-    with train_graph.as_default():
-        input_data, targets, lr, target_sequence_length, max_target_sequence_length, source_sequence_length = get_model_inputs()
+          training_decoder_output, inference_decoder_output = seq2seq_model(input_data,
+                                                                            targets,
+                                                                            lr,
+                                                                            target_sequence_length,
+                                                                            max_target_sequence_length,
+                                                                            source_sequence_length,
+                                                                            len(word_indexes.word_indexes),
+                                                                            len(word_indexes.word_indexes),
+                                                                            encoding_embedding_size,
+                                                                            decoding_embedding_size,
+                                                                            rnn_size,
+                                                                            num_layers)
 
-        training_decoder_output, inference_decoder_output = seq2seq_model(input_data,
-                                                                          targets,
-                                                                          lr,
-                                                                          target_sequence_length,
-                                                                          max_target_sequence_length,
-                                                                          source_sequence_length,
-                                                                          len(word_indexes.word_indexes),
-                                                                          len(word_indexes.word_indexes),
-                                                                          encoding_embedding_size,
-                                                                          decoding_embedding_size,
-                                                                          rnn_size,
-                                                                          num_layers)
+          training_logits = tf.identity(
+              training_decoder_output.rnn_output, "logits")
+          inference_logits = tf.identity(
+              inference_decoder_output.sample_id, name="predictions")
+          masks = tf.sequence_mask(
+              target_sequence_length, max_target_sequence_length, dtype=tf.float32, name='masks')
 
-        training_logits = tf.identity(
-            training_decoder_output.rnn_output, "logits")
-        inference_logits = tf.identity(
-            inference_decoder_output.sample_id, name="predictions")
-        masks = tf.sequence_mask(
-            target_sequence_length, max_target_sequence_length, dtype=tf.float32, name='masks')
+          with tf.name_scope("optimization"):
 
-        with tf.name_scope("optimization"):
+              # Loss function
+              cost = tf.contrib.seq2seq.sequence_loss(
+                  training_logits,
+                  targets,
+                  masks)
 
-            # Loss function
-            cost = tf.contrib.seq2seq.sequence_loss(
-                training_logits,
-                targets,
-                masks)
+              # Optimizer
+              optimizer = tf.train.AdamOptimizer(lr)
 
-            # Optimizer
-            optimizer = tf.train.AdamOptimizer(lr)
+              # Gradient Clipping
+              gradients = optimizer.compute_gradients(cost)
+              capped_gradients = [(tf.clip_by_value(grad, -5., 5.), var)
+                                  for grad, var in gradients if grad is not None]
+              train_op = optimizer.apply_gradients(capped_gradients)
 
-            # Gradient Clipping
-            gradients = optimizer.compute_gradients(cost)
-            capped_gradients = [(tf.clip_by_value(grad, -5., 5.), var)
-                                for grad, var in gradients if grad is not None]
-            train_op = optimizer.apply_gradients(capped_gradients)
+      # Split data to training and validation sets
+      train_source = source_letter_ids[batch_size:]
+      train_target = target_letter_ids[batch_size:]
+      valid_source = source_letter_ids[:batch_size]
+      valid_target = target_letter_ids[:batch_size]
+      (valid_targets_batch, valid_sources_batch, valid_targets_lengths, valid_sources_lengths) = next(get_batches(valid_target, valid_source, batch_size,
+                                                                                                                  source_letter_to_int[
+                                                                                                                      '<PAD>'],
+                                                                                                                  target_letter_to_int['<PAD>']))
 
-    # Split data to training and validation sets
-    train_source = source_letter_ids[batch_size:]
-    train_target = target_letter_ids[batch_size:]
-    valid_source = source_letter_ids[:batch_size]
-    valid_target = target_letter_ids[:batch_size]
-    (valid_targets_batch, valid_sources_batch, valid_targets_lengths, valid_sources_lengths) = next(get_batches(valid_target, valid_source, batch_size,
-                                                                                                                source_letter_to_int[
-                                                                                                                    '<PAD>'],
-                                                                                                                target_letter_to_int['<PAD>']))
+      display_step = 20  # Check training loss after every 20 batches
 
-    display_step = 20  # Check training loss after every 20 batches
-
-    checkpoint = "best_model.ckpt"
-    with tf.Session(graph=train_graph) as sess:
+      checkpoint = "./ckpts/best_model.ckpt"
+      device = "/gpu:0"
+    with tf.Session(graph=train_graph, config=tf.ConfigProto(log_device_placement=True)) as sess:
         sess.run(tf.global_variables_initializer())
 
         for epoch_i in range(1, epochs + 1):
