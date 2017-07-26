@@ -6,10 +6,11 @@ from helper import CSVParser, Padder
 class HeadlineModel:
 
     def __init__(self, filename):
-        """ 
+        """
         Constructor, filename.
         """
         self.lines = None
+        self.length = None
         with open(filename, "r") as day_headline_file:
             self.lines = day_headline_file.readlines()
 
@@ -27,7 +28,7 @@ class HeadlineModel:
 class DayHeadlineModel(HeadlineModel):
 
     def __init__(self, filename):
-        """ 
+        """
         Constructor, filename.
         """
         HeadlineModel.__init__(self, filename)
@@ -62,10 +63,12 @@ class DayHeadlineModel(HeadlineModel):
         return date_dict
 
     def __len__(self):
-        length = 0
-        for k, v in self.date_dict.items():
-            length += len(v.values())
-        return length
+        if self.length == None:
+            length = 0
+            for k, v in self.date_dict.items():
+                length += len(v.values())
+            self.length = length
+        return self.length
 
     def get_stats(self):
         counts = []
@@ -90,18 +93,26 @@ class DayHeadlineModel(HeadlineModel):
             min_value = min(min_value, len(min(v.values(), key=len)))
         return min_value
 
-    def minibatch(self, batch_size, pad=True):
+    def minibatch(self, batch_size, pad=True, full_information=False):
         """ Gets minibatch. """
-        # item_batchs = [ h for h in dates.values() for dates in self.date_dict.values()]
+        # item_batchs = [ h for h in dates.values() for dates in
+        # self.date_dict.values()]
         item_batches = []
-        for k, v in self.date_dict.items():
-            for item in v.values():
-                if pad:
-                    item = Padder.padd(item, 12, pad_int=0, dimension=400)
-                item_batches.append(item)
+        if full_information:
+            for k, v in self.date_dict.items():
+                for k1, v1 in v.items():
+                    if pad: 
+                        item = Padder.padd(v1, 12, pad_int=0, dimension=400)
+                    item_batches.append((k, k1, item))
+        else:
+            for k, v in self.date_dict.items():
+                for item in v.values():
+                    if pad:
+                        item = Padder.padd(item, 12, pad_int=0, dimension=400)
+                    item_batches.append(item)
 
-        print("Item batches", len(item_batches))
-        print("Headline per day", len(item_batches[0]))
+        # print("Item batches", len(item_batches))
+        # print("Headline per day", len(item_batches[0]))
         for i in range(0, self.__len__() // batch_size):
             start_i = i * batch_size
             batch = item_batches[start_i: start_i + batch_size]
@@ -118,10 +129,6 @@ class DayEncoder:
         self.epoch = epoch
         self.hidden_size = hidden_size
         self.display_step = display_step
-
-        # self.training_epochs = tra
-        # with tf.name_scope("inputs"):
-
 
         self.encoder_inputs = [tf.reshape(X, [-1, self.frame_dim])]
         outputs = [tf.reshape(y, [-1, self.frame_dim])]
@@ -176,29 +183,29 @@ class DayEncoder:
                     self.learning_rate).minimize(self.loss)
         return self.loss, self.optimizer
 
-    # def train(self, X, Y, device = None, restore=True):
-    #     init = tf.global_variables_initializer()
-    #     with tf.Session() as sess:
-    #         if restore:
-    #             saver.restore(sess, self.checkpoint_path)
-    #         else:
-    #             sess.run(init)
-    #         for epoch in range(self.epoch):
-    #             for index, items in enumerate(news.minibatch(batch_size)):
-
-
 def main():
     filename = "./data/encoded_headlines.csv"
     checkpoint = "./dayencoder/model.ckpt"
     day_headline_model = DayHeadlineModel(filename)
+
+    # Declearing hyper parameters.
+    print(" Initializing hyper parameters") 
     n_steps = 12
-    batch_size = 100
+    # batch_size = 100
+    batch_size = 1
     frame_dim = 400 
     display_step = 100
+
+
+    # Inputs.
+    print("Initializing inputs") 
     s_inputs = tf.placeholder(
         tf.float32, [n_steps, batch_size, frame_dim], name="s_inputs")
     s_outputs = tf.placeholder(
         tf.float32, [n_steps, batch_size, frame_dim], name="s_outputs")
+
+    # Creating the day encoder Model.
+    print("Creating model") 
     model = DayEncoder(s_inputs, s_outputs, n_steps,
                        batch_size=batch_size,
                        frame_dim=frame_dim,
@@ -206,43 +213,72 @@ def main():
                        hidden_size=500,
                        learning_rate=0.0001,
                        display_step=100)
-    _, decoder = model.initialize_rnn()
+    # Initialize the RNN network
+    # TODO: Add Bidirectionality.
+    encoder_state, decoder = model.initialize_rnn()
+
+    # Initialize Loss functions: (Adam, RMSProp).
     loss, optimizer = model.loss(decoder, "Adam")
+
     init = tf.global_variables_initializer()
     saver = tf.train.Saver() 
     prev_loss = None
 
     with tf.Session() as sess:
-        sess.run(init)
-        for ep in range(model.epoch):
-            for i, items in enumerate(day_headline_model.minibatch(batch_size)):
+        saver.restore(sess, checkpoint)
+        # sess.run(init)
+        # for ep in range(model.epoch):
+        #     for i, items in enumerate(day_headline_model.minibatch(batch_size)):
+        #         inputs = []
+        #         outputs = []
+
+        #         for (a, b) in items:
+        #             inputs.append(a)
+        #             outputs.append(b)
+
+        #         inputs = np.stack(inputs, axis=0)
+        #         # print(inputs.shape)
+        #         inputs_T = np.transpose(inputs, axes=[1, 0, 2])
+
+        #         outputs = np.stack(outputs, axis=0)
+        #         # print(outputs.shape)
+        #         outputs_T = np.transpose(outputs, axes=[1, 0, 2])
+
+        #         feed_dict = {s_inputs: inputs_T, s_outputs: outputs_T}
+        #         summary, cost = sess.run([optimizer, loss], feed_dict=feed_dict)
+        #         if i % display_step == 0:
+        #             print("Cost is {} Ep: {}".format(cost, ep))
+        #     if ep % 3 == 2:
+        #         if prev_loss == None:
+        #             prev_loss = cost
+        #         else:
+        #             if prev_loss > cost:
+        #                 saver.save(sess, checkpoint)
+        #                 prev_loss = cost
+        #     print("Epoch 000{}, Cost: {}".format(ep, cost))
+
+        # Predictons.
+        # TODO: Store the encoded values as (ticker, date, values) 
+        with open("./data/encoded_day.csv", "w") as encoded_day_file:
+            for index, items in enumerate(day_headline_model.minibatch(batch_size, full_information=True)):
                 inputs = []
-                outputs = []
+                ticker, date, vectors = items[0]
+                for x in vectors[0]:
+                    inputs.append(np.array(x))
+                inputs = np.stack(inputs, axis = 0)
+                inputs = np.expand_dims(inputs, 0) 
+                inputs = np.transpose(inputs, axes=[1,0,2])
+                # break
+                feed = {s_inputs: inputs}
+                enc_states = sess.run(encoder_state, feed)
+                # print(enco)
+                encoded_input = " ".join(list(map(str, enc_states[-1])))
+                encoded_output = "{},{},{}\n".format(ticker, date, encoded_input)
+                encoded_day_file.write(encoded_output)
+        encoded_day_file.close() 
 
-                for (a, b) in items:
-                    inputs.append(a)
-                    outputs.append(b)
 
-                inputs = np.stack(inputs, axis=0)
-                # print(inputs.shape)
-                inputs_T = np.transpose(inputs, axes=[1, 0, 2])
 
-                outputs = np.stack(outputs, axis=0)
-                # print(outputs.shape)
-                outputs_T = np.transpose(outputs, axes=[1, 0, 2])
-
-                feed_dict = {s_inputs: inputs_T, s_outputs: outputs_T}
-                summary, cost = sess.run([optimizer, loss], feed_dict=feed_dict)
-                if i % display_step == 0:
-                    print("Cost is {} Ep: {}".format(cost, ep))
-            if ep % 3 == 2:
-                if prev_loss == None:
-                    prev_loss = cost
-                else:
-                    if prev_loss > cost:
-                        saver.save(sess, checkpoint)
-                        prev_loss = cost
-            print("Epoch 000{}, Cost: {}".format(ep, cost))
 
 
     # init = tf.global_variables_initializer()
