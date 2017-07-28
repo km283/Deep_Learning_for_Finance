@@ -1,8 +1,6 @@
 import tensorflow as tf
 import numpy as np
-
 from helper import CSVParser, Padder
-from tf.contrib.layers import variance_scaling_initializer
 
 
 class HeadlineModel:
@@ -103,7 +101,7 @@ class DayHeadlineModel(HeadlineModel):
         if full_information:
             for k, v in self.date_dict.items():
                 for k1, v1 in v.items():
-                    if pad: 
+                    if pad:
                         item = Padder.padd(v1, 12, pad_int=0, dimension=400)
                     item_batches.append((k, k1, item))
         else:
@@ -124,6 +122,11 @@ class DayHeadlineModel(HeadlineModel):
 class DayEncoder:
 
     def __init__(self, X, y, n_steps, batch_size=100, frame_dim=400, epoch=100, hidden_size=400, learning_rate=0.0001, display_step=100):
+        """
+        Constructor
+        X: [num_steps, batch_size, n_inputs]
+        y: [num_steps, batch_size, n_inputs]
+        """
         self.learning_rate = learning_rate
         self.number_of_steps = n_steps
         self.batch_size = batch_size
@@ -132,36 +135,58 @@ class DayEncoder:
         self.hidden_size = hidden_size
         self.display_step = display_step
 
-        self.encoder_inputs = [tf.reshape(X, [-1, self.frame_dim])]
-        outputs = [tf.reshape(y, [-1, self.frame_dim])]
 
+        # self.encoder_inputs = [tf.reshape(X, [-1, self.frame_dim])]
+        # outputs = [tf.reshape(y, [-1, self.frame_dim])]
+        self.encoder_inputs = tf.unstack(X, axis = 0)
         self.decoder_inputs = (
             [tf.zeros_like(self.encoder_inputs[0], name="GO")] + self.encoder_inputs[:-1])
-        self.targets = outputs
+        # self.targets = outputs
+
+        # EOS_SLICE = tf.ones([1, batch_size], dtype=tf.float32) * 0
+        # PAD_SLICE = tf.ones([1, batch_size], dtype=tf.float32) * 1
+
+        self.decoder_inputs = tf.concat([EOS_SLICE, self.encoder_inputs[:-1]])
+
         # weights = [tf.ones_like(targets_t, dtype=tf.float32) for targets_t in self.targets]
 
-
-    def initialize_rnn(self, rnn_type = "GRU"):
+    def initialize_rnn(self, rnn_type="GRU"):
         # with tf.name_scope("rnn"):
-        # with tf.variable_scope("rnn_layer", reuse =True):
-        with tf.variable_scope("rnn_layer", initializer=variance_scaling_initializer()):
-            if rnn_type == "GRU":
-                cell = tf.contrib.rnn.GRUCell(self.hidden_size)
-            else:
-                cell = tf.contrib.rnn.LSTMCell(self.hidden_size)
+        # with tf.variable_scope("rnn_layer", reuse = False):
 
-            output, encoder_state = tf.contrib.rnn.static_rnn(
-                cell, self.encoder_inputs, dtype=tf.float32)
+        if rnn_type == "GRU":
+            fw_cell = tf.contrib.rnn.GRUCell(self.hidden_size)
+            bw_cell = tf.contrib.rnn.GRUCell(self.hidden_size)
+        else:
+            fw_cell = tf.contrib.rnn.LSTMCell(self.hidden_size)
+            bw_cell = tf.contrib.rnn.LSTMCell(self.hidden_size)
 
-            cell = tf.contrib.rnn.OutputProjectionWrapper(cell, self.frame_dim)
-            decoder_outputs, dec_state = tf.contrib.legacy_seq2seq.rnn_decoder(
-                self.decoder_inputs, encoder_state, cell)
+        outputs, o_fw, o_bw = tf.contrib.rnn.static_bidirectional_rnn(fw_cell, bw_cell,
+                                                                      self.encoder_inputs,
+                                                                      dtype=tf.float32)
+        encoder_state = tf.concat((o_fw, o_bw), axis=1)
 
+        # with tf.variable_scope("decoder") as scope:
+        #     def loop_fn(values):
+        #         return tf.contrib.layers.linear(outputs, self.frame_dim, scope=scope)
+
+            # fw_cell = tf.contrib.rnn.OutputProjectionWrapper(fw_cell, self.frame_dim)
+            # bw_cell = tf.contrib.rnn.OutputProjectionWrapper(bw_cell, self.frame_dim)
+            # cell = tf.contrib.rnn.OutputProjectionWrapper(fw_cell, self.frame_dim)
+        decoder_outputs, dec_state = \
+        tf.contrib.legacy_seq2seq.rnn_decoder(self.decoder_inputs, 
+                                                encoder_state,
+                                                fw_cell,
+                                                loop_function=loop_fn)
+
+            # dec_outputs, _, _ = tf.contrib.rnn.static_bidirectional_rnn(fw_cell, bw_cell,
+            #                                                             self.decoder_inputs,
+            #                                                             initial_state_fw=o_fw,
+            #                                                             initial_state_bw=o_bw,
+            #                                                             dtype = tf.float32)
+            # dec_outputs = tf.contrib.rnn.OutputProjectionWrapper(dec_outputs, self.frame_dim)
+            # return encoder_state, decoder_outputs
         return encoder_state, decoder_outputs
-
-            # y_true = [tf.reshape(encoder_input, [-1]) for encoder_input in encoder_inputs]
-            # y_pred = [tf.reshape(dec_output, [-1]) for dec_output in dec_outputs]
-            # return y_pred, y_trye=
 
     def get_loss(self, encoder_inputs, decoder_outputs):
         y_true = [tf.reshape(encoder_input, [-1])
@@ -186,29 +211,29 @@ class DayEncoder:
                     self.learning_rate).minimize(self.loss)
         return self.loss, self.optimizer
 
+
 def main():
     filename = "./data/encoded_headlines.csv"
-    checkpoint = "./dayencoder/model.ckpt"
+    checkpoint = "./daybiencoder/model.ckpt"
     day_headline_model = DayHeadlineModel(filename)
 
     # Declearing hyper parameters.
-    print(" Initializing hyper parameters") 
+    print(" Initializing hyper parameters")
     n_steps = 12
     # batch_size = 100
     batch_size = 1
-    frame_dim = 400 
+    frame_dim = 400
     display_step = 100
 
-
     # Inputs.
-    print("Initializing inputs") 
+    print("Initializing inputs")
     s_inputs = tf.placeholder(
         tf.float32, [n_steps, batch_size, frame_dim], name="s_inputs")
     s_outputs = tf.placeholder(
         tf.float32, [n_steps, batch_size, frame_dim], name="s_outputs")
 
     # Creating the day encoder Model.
-    print("Creating model") 
+    print("Creating model")
     model = DayEncoder(s_inputs, s_outputs, n_steps,
                        batch_size=batch_size,
                        frame_dim=frame_dim,
@@ -224,65 +249,62 @@ def main():
     loss, optimizer = model.loss(decoder, "Adam")
 
     init = tf.global_variables_initializer()
-    saver = tf.train.Saver() 
+    saver = tf.train.Saver()
     prev_loss = None
 
     with tf.Session() as sess:
-        saver.restore(sess, checkpoint)
-        # sess.run(init)
-        # for ep in range(model.epoch):
-        #     for i, items in enumerate(day_headline_model.minibatch(batch_size)):
-        #         inputs = []
-        #         outputs = []
+        # saver.restore(sess, checkpoint)
+        sess.run(init)
+        for ep in range(model.epoch):
+            for i, items in enumerate(day_headline_model.minibatch(batch_size)):
+                inputs = []
+                outputs = []
 
-        #         for (a, b) in items:
-        #             inputs.append(a)
-        #             outputs.append(b)
+                for (a, b) in items:
+                    inputs.append(a)
+                    outputs.append(b)
 
-        #         inputs = np.stack(inputs, axis=0)
-        #         # print(inputs.shape)
-        #         inputs_T = np.transpose(inputs, axes=[1, 0, 2])
+                inputs = np.stack(inputs, axis=0)
+                # print(inputs.shape)
+                inputs_T = np.transpose(inputs, axes=[1, 0, 2])
 
-        #         outputs = np.stack(outputs, axis=0)
-        #         # print(outputs.shape)
-        #         outputs_T = np.transpose(outputs, axes=[1, 0, 2])
+                outputs = np.stack(outputs, axis=0)
+                # print(outputs.shape)
+                outputs_T = np.transpose(outputs, axes=[1, 0, 2])
 
-        #         feed_dict = {s_inputs: inputs_T, s_outputs: outputs_T}
-        #         summary, cost = sess.run([optimizer, loss], feed_dict=feed_dict)
-        #         if i % display_step == 0:
-        #             print("Cost is {} Ep: {}".format(cost, ep))
-        #     if ep % 3 == 2:
-        #         if prev_loss == None:
-        #             prev_loss = cost
-        #         else:
-        #             if prev_loss > cost:
-        #                 saver.save(sess, checkpoint)
-        #                 prev_loss = cost
-        #     print("Epoch 000{}, Cost: {}".format(ep, cost))
+                feed_dict = {s_inputs: inputs_T, s_outputs: outputs_T}
+                summary, cost = sess.run(
+                    [optimizer, loss], feed_dict=feed_dict)
+                if i % display_step == 0:
+                    print("Cost is {} Ep: {}".format(cost, ep))
+            if ep % 3 == 2:
+                if prev_loss == None:
+                    prev_loss = cost
+                else:
+                    if prev_loss > cost:
+                        saver.save(sess, checkpoint)
+                        prev_loss = cost
+            print("Epoch 000{}, Cost: {}".format(ep, cost))
 
         # Predictons.
-        # TODO: Store the encoded values as (ticker, date, values) 
-        with open("./data/encoded_day.csv", "w") as encoded_day_file:
-            for index, items in enumerate(day_headline_model.minibatch(batch_size, full_information=True)):
-                inputs = []
-                ticker, date, vectors = items[0]
-                for x in vectors[0]:
-                    inputs.append(np.array(x))
-                inputs = np.stack(inputs, axis = 0)
-                inputs = np.expand_dims(inputs, 0) 
-                inputs = np.transpose(inputs, axes=[1,0,2])
-                # break
-                feed = {s_inputs: inputs}
-                enc_states = sess.run(encoder_state, feed)
-                # print(enco)
-                encoded_input = " ".join(list(map(str, enc_states[-1])))
-                encoded_output = "{},{},{}\n".format(ticker, date, encoded_input)
-                encoded_day_file.write(encoded_output)
-        encoded_day_file.close() 
-
-
-
-
+        # TODO: Store the encoded values as (ticker, date, values)
+        # with open("./data/encoded_day.csv", "w") as encoded_day_file:
+        #     for index, items in enumerate(day_headline_model.minibatch(batch_size, full_information=True)):
+        #         inputs = []
+        #         ticker, date, vectors = items[0]
+        #         for x in vectors[0]:
+        #             inputs.append(np.array(x))
+        #         inputs = np.stack(inputs, axis = 0)
+        #         inputs = np.expand_dims(inputs, 0)
+        #         inputs = np.transpose(inputs, axes=[1,0,2])
+        #         # break
+        #         feed = {s_inputs: inputs}
+        #         enc_states = sess.run(encoder_state, feed)
+        #         # print(enco)
+        #         encoded_input = " ".join(list(map(str, enc_states[-1])))
+        #         encoded_output = "{},{},{}\n".format(ticker, date, encoded_input)
+        #         encoded_day_file.write(encoded_output)
+        # encoded_day_file.close()
 
     # init = tf.global_variables_initializer()
     # with tf.Session() as sess:
