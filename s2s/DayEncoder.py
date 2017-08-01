@@ -1,57 +1,41 @@
+import sys, os.path
 import tensorflow as tf
 import numpy as np
 
-from helper import CSVParser, Padder
-from tf.contrib.layers import variance_scaling_initializer
+# Import Parent Directory
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
+from utils.model import Model
+from utils.helper import CSVParser, Padder
+
+from tensorflow.contrib.layers import variance_scaling_initializer
 
 
-class HeadlineModel:
-
-    def __init__(self, filename):
-        """
-        Constructor, filename.
-        """
-        self.lines = None
-        self.length = None
-        with open(filename, "r") as day_headline_file:
-            self.lines = day_headline_file.readlines()
-
-    def __len__(self):
-        """ This returns the len of the file. """
-        return len(self.lines)
-
-    def max_headline_count(self):
-        """
-        returns the max headline count
-        """
-        raise NotImplementedError("You need to implement this feature")
-
-
-class DayHeadlineModel(HeadlineModel):
+class DayHeadlineModel(Model):
 
     def __init__(self, filename):
         """
         Constructor, filename.
         """
-        HeadlineModel.__init__(self, filename)
+        Model.__init__(self, filename)
         self.date_dict = self.group_by_day()
 
     def group_by_day(self):
+        """
+            This groups the headlines by day.
+        """
         date_dict = {}
-        parser = CSVParser()
         for items in self.lines:
-            values = parser.parse(items)
+            values = CSVParser.parse(items)
             date = values[0]
             ticker = values[1]
             vectors = list(map(float, values[2].split()))
             date_ticker = date_dict.get(ticker, None)
             if date_ticker == None:
                 day_vectors = {}
-
                 vectors_list = []
                 vectors_list.append(np.array(vectors))
-                # print(len(vectors))
-
                 day_vectors[date] = vectors_list
                 date_dict[ticker] = day_vectors
             else:
@@ -65,6 +49,9 @@ class DayHeadlineModel(HeadlineModel):
         return date_dict
 
     def __len__(self):
+        """
+        This returns the len of the items.
+        """
         if self.length == None:
             length = 0
             for k, v in self.date_dict.items():
@@ -73,6 +60,9 @@ class DayHeadlineModel(HeadlineModel):
         return self.length
 
     def get_stats(self):
+        """ 
+        Returns basic statistics of the file
+        """
         counts = []
         # counts = list(map(len, self.date_dict.values()))
         # counts = np.array(counts)
@@ -80,8 +70,9 @@ class DayHeadlineModel(HeadlineModel):
         # return np.mean(counts), np.median(counts)
 
     def max_day_headlines(self):
-        # for _, values in self.date_dict:
-        # return len(max(self.date_dict.values().values(), key=len))
+        """ 
+        This returns the max headline of the item list.
+        """
         max_value = 0
         for k, v in self.date_dict.items():
             # print(len(v.values()))
@@ -186,10 +177,18 @@ class DayEncoder:
                     self.learning_rate).minimize(self.loss)
         return self.loss, self.optimizer
 
+
+
 def main():
+    """ 
+        This method performs all of the operation.
+    """ 
+
     filename = "./data/encoded_headlines.csv"
     checkpoint = "./dayencoder/model.ckpt"
     day_headline_model = DayHeadlineModel(filename)
+    print(len(day_headline_model.date_dict))
+    sys.exit(1)
 
     # Declearing hyper parameters.
     print(" Initializing hyper parameters") 
@@ -226,6 +225,7 @@ def main():
     init = tf.global_variables_initializer()
     saver = tf.train.Saver() 
     prev_loss = None
+
 
     with tf.Session() as sess:
         saver.restore(sess, checkpoint)

@@ -1,6 +1,12 @@
+import os.path
+import sys
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
 import tensorflow as tf
 import numpy as np
-from helper import CSVParser, Padder
+
+from utils.helper import CSVParser, Padder
 
 
 class HeadlineModel:
@@ -121,7 +127,16 @@ class DayHeadlineModel(HeadlineModel):
 
 class DayEncoder:
 
-    def __init__(self, X, y, n_steps, batch_size=100, frame_dim=400, epoch=100, hidden_size=400, learning_rate=0.0001, display_step=100):
+    def __init__(self, X, y, 
+        n_steps, 
+        batch_size=100, 
+        frame_dim=400,
+        epoch=100, 
+        hidden_size=400,
+        learning_rate=0.0001,
+        display_step=100,
+        is_training = None,
+        dropout_rate = 0.3):
         """
         Constructor
         X: [num_steps, batch_size, n_inputs]
@@ -136,79 +151,105 @@ class DayEncoder:
         self.display_step = display_step
 
 
-        # self.encoder_inputs = [tf.reshape(X, [-1, self.frame_dim])]
-        # outputs = [tf.reshape(y, [-1, self.frame_dim])]
-        self.encoder_inputs = tf.unstack(X, axis = 0)
+        self.lambda_l2_reg = tf.placeholder(tf.float32, name="lambda_l2_reg")
+
+        # self.is_training = tf.placeholder(tf.bool, name='is_training')
+        self.is_training = is_training
+        self.dropout_rate = dropout_rate
+
+        batch_normalize_inputs = tf.contrib.layers.batch_norm(
+            X, is_training=self.is_training)
+
+        self.encoder_inputs = tf.transpose(
+            batch_normalize_inputs, perm=[1, 0, 2])
+
+        # Unstack encoder inputs.
+        # Prefill first column with zeros.
+        # Order with permutation.
         self.decoder_inputs = (
-            [tf.zeros_like(self.encoder_inputs[0], name="GO")] + self.encoder_inputs[:-1])
-        # self.targets = outputs
-
-        # EOS_SLICE = tf.ones([1, batch_size], dtype=tf.float32) * 0
-        # PAD_SLICE = tf.ones([1, batch_size], dtype=tf.float32) * 1
-
-        self.decoder_inputs = tf.concat([EOS_SLICE, self.encoder_inputs[:-1]])
-
-        # weights = [tf.ones_like(targets_t, dtype=tf.float32) for targets_t in self.targets]
+            [tf.zeros_like(self.encoder_inputs[0], name="GO")] + tf.unstack(self.encoder_inputs)[:-1])
+        self.decoder_inputs = tf.stack(self.decoder_inputs)
+        self.decoder_inputs = tf.transpose(self.decoder_inputs, perm=[1, 0, 2])
 
     def initialize_rnn(self, rnn_type="GRU"):
-        # with tf.name_scope("rnn"):
-        # with tf.variable_scope("rnn_layer", reuse = False):
+        with tf.variable_scope("rnn_encoder", initializer=tf.contrib.layers.variance_scaling_initializer(seed=2)):
+            if rnn_type == "GRU":
+                fw_cell = tf.contrib.rnn.GRUCell(
+                    self.hidden_size, activation=tf.nn.elu)
+                bw_cell = tf.contrib.rnn.GRUCell(
+                    self.hidden_size, activation=tf.nn.elu)
+            else:
+                fw_cell = tf.contrib.rnn.LSTMCell(
+                    self.hidden_size, activation=tf.nn.elu)
+                bw_cell = tf.contrib.rnn.LSTMCell(
+                    self.hidden_size, activation=tf.nn.elu)
 
-        if rnn_type == "GRU":
-            fw_cell = tf.contrib.rnn.GRUCell(self.hidden_size)
-            bw_cell = tf.contrib.rnn.GRUCell(self.hidden_size)
-        else:
-            fw_cell = tf.contrib.rnn.LSTMCell(self.hidden_size)
-            bw_cell = tf.contrib.rnn.LSTMCell(self.hidden_size)
+            outputs, encoder_state = tf.nn.bidirectional_dynamic_rnn(fw_cell, bw_cell,
+                                                                     self.encoder_inputs,
+                                                                     dtype=tf.float32)
 
-        outputs, o_fw, o_bw = tf.contrib.rnn.static_bidirectional_rnn(fw_cell, bw_cell,
-                                                                      self.encoder_inputs,
-                                                                      dtype=tf.float32)
-        encoder_state = tf.concat((o_fw, o_bw), axis=1)
+        with tf.variable_scope("rnn_decoder", 
+            initializer=tf.contrib.layers.variance_scaling_initializer(seed=2)):
+            decode_data_norm = tf.contrib.layers.batch_norm(
+                self.decoder_inputs, is_training=self.is_training)
+            # Add dropout
+            if rnn_type == "GRU":
+                dec_fw_cell = tf.contrib.rnn.GRUCell(
+                    self.hidden_size, activation=tf.nn.elu)
+                dec_bw_cell = tf.contrib.rnn.GRUCell(
+                    self.hidden_size, activation=tf.nn.elu)
+            else:
+                dec_fw_cell = tf.contrib.rnn.LSTMCell(
+                    self.hidden_size, activation=tf.nn.elu)
+                dec_bw_cell = tf.contrib.rnn.LSTMCell(
+                    self.hidden_size, activation=tf.nn.elu)
 
-        # with tf.variable_scope("decoder") as scope:
-        #     def loop_fn(values):
-        #         return tf.contrib.layers.linear(outputs, self.frame_dim, scope=scope)
+            decoder_outputs, _ = tf.nn.bidirectional_dynamic_rnn(
+                dec_fw_cell,
+                dec_bw_cell,
+                self.decoder_inputs,
+                initial_state_fw=encoder_state[0],
+                initial_state_bw=encoder_state[1],
+                time_major=True,
+                dtype=tf.float32)
 
-            # fw_cell = tf.contrib.rnn.OutputProjectionWrapper(fw_cell, self.frame_dim)
-            # bw_cell = tf.contrib.rnn.OutputProjectionWrapper(bw_cell, self.frame_dim)
-            # cell = tf.contrib.rnn.OutputProjectionWrapper(fw_cell, self.frame_dim)
-        decoder_outputs, dec_state = \
-        tf.contrib.legacy_seq2seq.rnn_decoder(self.decoder_inputs, 
-                                                encoder_state,
-                                                fw_cell,
-                                                loop_function=loop_fn)
+            # BIDirectional --> Batch Norm --> Droput --> Dense(frame_dim)
+            decoder_outputs = tf.contrib.layers.batch_norm(tf.concat(decoder_outputs, 2), is_training=self.is_training)
+            # decoder_outputs = tf.contrib.layers.batch_norm(decoder_outputs[1], is_training =  self.is_training)
+            decoder_outputs = tf.contrib.layers.dropout(decoder_outputs, self.dropout_rate)
+            decoder_outputs = tf.layers.dense(decoder_outputs, self.frame_dim)
 
-            # dec_outputs, _, _ = tf.contrib.rnn.static_bidirectional_rnn(fw_cell, bw_cell,
-            #                                                             self.decoder_inputs,
-            #                                                             initial_state_fw=o_fw,
-            #                                                             initial_state_bw=o_bw,
-            #                                                             dtype = tf.float32)
-            # dec_outputs = tf.contrib.rnn.OutputProjectionWrapper(dec_outputs, self.frame_dim)
-            # return encoder_state, decoder_outputs
+
+            # decoder_outputs = tf.layers.dense(
+            #     decoder_outputs[0], self.frame_dim)
+
         return encoder_state, decoder_outputs
 
-    def get_loss(self, encoder_inputs, decoder_outputs):
-        y_true = [tf.reshape(encoder_input, [-1])
-                  for encoder_input in encoder_inputs]
-        y_pred = [tf.reshape(dec_output, [-1])
-                  for dec_output in decoder_outputs]
-        return y_pred, y_true
+    # def get_loss(self, encoder_inputs, decoder_outputs):
+    #     y_true = tf.unstack(encoder_inputs)
+    #     y_pred = tf.unstack(decoder_outputs)
+    #     return y_pred, y_true
 
     def loss(self, decoder_outputs, loss_func="Adam"):
-        """ This takes in the loss function """
-        y_pred, y_true = self.get_loss(self.encoder_inputs, decoder_outputs)
-        with tf.name_scope("loss"):
-            self.loss = 0
-            for i in range(len(y_true)):
-                self.loss += tf.reduce_sum(
-                    tf.square(tf.subtract(y_pred[i], y_true[i])))
-            if loss_func == "Adam":
-                self.optimizer = tf.train.AdamOptimizer(
-                    self.learning_rate).minimize(self.loss)
-            else:
-                self.optimizer = tf.train.RMSPropOptimizer(
-                    self.learning_rate).minimize(self.loss)
+
+        # Regularization parameter.
+        l2 = self.lambda_l2_reg * sum(
+                tf.nn.l2_loss(tf_var)
+                    for tf_var in tf.trainable_variables()
+                    if not ("BatchNorm" in tf_var.name or "bias" in tf_var.name)
+            )
+        # Compute loss.
+        self.loss = tf.reduce_sum(
+            tf.square(tf.subtract(self.decoder_inputs, decoder_outputs)))
+        # Add regularization.
+        self.loss = tf.add(self.loss, l2)
+
+        if loss_func == "Adam":
+            self.optimizer = tf.train.AdamOptimizer(
+                self.learning_rate).minimize(self.loss)
+        else:
+            self.optimizer = tf.train.RMSPropOptimizer(
+                self.learning_rate).minimize(self.loss)
         return self.loss, self.optimizer
 
 
@@ -218,7 +259,7 @@ def main():
     day_headline_model = DayHeadlineModel(filename)
 
     # Declearing hyper parameters.
-    print(" Initializing hyper parameters")
+    print("Initializing hyper parameters")
     n_steps = 12
     # batch_size = 100
     batch_size = 1
@@ -232,6 +273,9 @@ def main():
     s_outputs = tf.placeholder(
         tf.float32, [n_steps, batch_size, frame_dim], name="s_outputs")
 
+    is_training = tf.placeholder(tf.bool, name='is_training')
+
+
     # Creating the day encoder Model.
     print("Creating model")
     model = DayEncoder(s_inputs, s_outputs, n_steps,
@@ -240,7 +284,8 @@ def main():
                        epoch=100,
                        hidden_size=500,
                        learning_rate=0.0001,
-                       display_step=100)
+                       display_step=100, 
+                       is_training=is_training)
     # Initialize the RNN network
     # TODO: Add Bidirectionality.
     encoder_state, decoder = model.initialize_rnn()
@@ -272,7 +317,9 @@ def main():
                 # print(outputs.shape)
                 outputs_T = np.transpose(outputs, axes=[1, 0, 2])
 
-                feed_dict = {s_inputs: inputs_T, s_outputs: outputs_T}
+                feed_dict = {s_inputs: inputs_T,
+                             s_outputs: outputs_T,
+                             is_training: True}
                 summary, cost = sess.run(
                     [optimizer, loss], feed_dict=feed_dict)
                 if i % display_step == 0:
