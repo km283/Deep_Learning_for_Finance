@@ -136,6 +136,7 @@ class DayEncoder:
         learning_rate=0.0001,
         display_step=100,
         is_training = None,
+        l2_reg = None, 
         dropout_rate = 0.3):
         """
         Constructor
@@ -151,7 +152,7 @@ class DayEncoder:
         self.display_step = display_step
 
 
-        self.lambda_l2_reg = tf.placeholder(tf.float32, name="lambda_l2_reg")
+        self.lambda_l2_reg = l2_reg
 
         # self.is_training = tf.placeholder(tf.bool, name='is_training')
         self.is_training = is_training
@@ -170,6 +171,7 @@ class DayEncoder:
             [tf.zeros_like(self.encoder_inputs[0], name="GO")] + tf.unstack(self.encoder_inputs)[:-1])
         self.decoder_inputs = tf.stack(self.decoder_inputs)
         self.decoder_inputs = tf.transpose(self.decoder_inputs, perm=[1, 0, 2])
+        self.targets = y 
 
     def initialize_rnn(self, rnn_type="GRU"):
         with tf.variable_scope("rnn_encoder", initializer=tf.contrib.layers.variance_scaling_initializer(seed=2)):
@@ -240,7 +242,7 @@ class DayEncoder:
             )
         # Compute loss.
         self.loss = tf.reduce_sum(
-            tf.square(tf.subtract(self.decoder_inputs, decoder_outputs)))
+            tf.square(tf.subtract(self.targets, decoder_outputs)))
         # Add regularization.
         self.loss = tf.add(self.loss, l2)
 
@@ -273,6 +275,8 @@ def main():
     s_outputs = tf.placeholder(
         tf.float32, [n_steps, batch_size, frame_dim], name="s_outputs")
 
+    l2_reg = tf.placeholder(tf.float32, name="lambda_l2_reg")
+
     is_training = tf.placeholder(tf.bool, name='is_training')
 
 
@@ -285,6 +289,7 @@ def main():
                        hidden_size=500,
                        learning_rate=0.0001,
                        display_step=100, 
+                       l2_reg=l2_reg,
                        is_training=is_training)
     # Initialize the RNN network
     # TODO: Add Bidirectionality.
@@ -319,18 +324,20 @@ def main():
 
                 feed_dict = {s_inputs: inputs_T,
                              s_outputs: outputs_T,
-                             is_training: True}
+                             is_training: True, 
+                             l2_reg: 0.3}
                 summary, cost = sess.run(
                     [optimizer, loss], feed_dict=feed_dict)
                 if i % display_step == 0:
                     print("Cost is {} Ep: {}".format(cost, ep))
-            if ep % 3 == 2:
-                if prev_loss == None:
+            # if ep % 3 == 2:
+            if prev_loss == None:
+                prev_loss = cost
+                saver.save(sess, checkpoint)
+            else:
+                if prev_loss > cost:
+                    saver.save(sess, checkpoint)
                     prev_loss = cost
-                else:
-                    if prev_loss > cost:
-                        saver.save(sess, checkpoint)
-                        prev_loss = cost
             print("Epoch 000{}, Cost: {}".format(ep, cost))
 
         # Predictons.

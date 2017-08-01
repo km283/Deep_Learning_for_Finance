@@ -2,8 +2,10 @@ import sys
 import tensorflow as tf
 import numpy as np
 
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-from helper import *
+from utils.helper import *
 
 
 # DATADIR = "../data/"
@@ -51,7 +53,8 @@ n_steps = 53
 # each element/frame of the sequence has dimension of 3
 frame_dim = 300
 
-initializer = tf.random_uniform_initializer(-1, 1)
+
+
 
 # the sequences, has n steps of maximum size
 seq_input = tf.placeholder(tf.float32, [n_steps, batch_size, frame_dim])

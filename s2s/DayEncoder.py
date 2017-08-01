@@ -88,8 +88,8 @@ class DayHeadlineModel(Model):
 
     def minibatch(self, batch_size, pad=True, full_information=False):
         """ Gets minibatch. """
-        # item_batchs = [ h for h in dates.values() for dates in
-        # self.date_dict.values()]
+        # TODO: Get minibatch function to also send the sequence len of the file that is being sent. 
+        # The return value should be (batch, seq_array).
         item_batches = []
         if full_information:
             for k, v in self.date_dict.items():
@@ -114,7 +114,16 @@ class DayHeadlineModel(Model):
 
 class DayEncoder:
 
-    def __init__(self, X, y, n_steps, batch_size=100, frame_dim=400, epoch=100, hidden_size=400, learning_rate=0.0001, display_step=100):
+    def __init__(self, X, y, 
+        n_steps, 
+        batch_size=100, 
+        frame_dim=400, 
+        epoch=100, 
+        hidden_size=400, 
+        learning_rate=0.0001,
+        display_step=100):
+
+        # Declearing hyper parameters.
         self.learning_rate = learning_rate
         self.number_of_steps = n_steps
         self.batch_size = batch_size
@@ -123,9 +132,11 @@ class DayEncoder:
         self.hidden_size = hidden_size
         self.display_step = display_step
 
+        # Declaring Encoder Inputs.
         self.encoder_inputs = [tf.reshape(X, [-1, self.frame_dim])]
         outputs = [tf.reshape(y, [-1, self.frame_dim])]
 
+        # Decoder inputs.
         self.decoder_inputs = (
             [tf.zeros_like(self.encoder_inputs[0], name="GO")] + self.encoder_inputs[:-1])
         self.targets = outputs
@@ -149,10 +160,6 @@ class DayEncoder:
                 self.decoder_inputs, encoder_state, cell)
 
         return encoder_state, decoder_outputs
-
-            # y_true = [tf.reshape(encoder_input, [-1]) for encoder_input in encoder_inputs]
-            # y_pred = [tf.reshape(dec_output, [-1]) for dec_output in dec_outputs]
-            # return y_pred, y_trye=
 
     def get_loss(self, encoder_inputs, decoder_outputs):
         y_true = [tf.reshape(encoder_input, [-1])
@@ -229,18 +236,22 @@ def main():
 
     with tf.Session() as sess:
         saver.restore(sess, checkpoint)
+
+        # BATCH ---> INPUT --> TRAIN
         # sess.run(init)
-        # for ep in range(model.epoch):
-        #     for i, items in enumerate(day_headline_model.minibatch(batch_size)):
-        #         inputs = []
-        #         outputs = []
+        for ep in range(model.epoch):
+            for i, items in enumerate(day_headline_model.minibatch(batch_size)):
+                inputs = []
+                outputs = []
 
-        #         for (a, b) in items:
-        #             inputs.append(a)
-        #             outputs.append(b)
+                for (a, b) in items:
+                    inputs.append(a)
+                    outputs.append(b)
 
-        #         inputs = np.stack(inputs, axis=0)
-        #         # print(inputs.shape)
+                inputs = np.stack(inputs, axis=0)
+                print(inputs).shape
+                sys.exit(1)
+                # print(inputs.shape)
         #         inputs_T = np.transpose(inputs, axes=[1, 0, 2])
 
         #         outputs = np.stack(outputs, axis=0)
@@ -270,7 +281,9 @@ def main():
                     inputs.append(np.array(x))
                 inputs = np.stack(inputs, axis = 0)
                 inputs = np.expand_dims(inputs, 0) 
+
                 inputs = np.transpose(inputs, axes=[1,0,2])
+
                 # break
                 feed = {s_inputs: inputs}
                 enc_states = sess.run(encoder_state, feed)
