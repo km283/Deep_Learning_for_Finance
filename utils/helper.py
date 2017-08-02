@@ -71,7 +71,7 @@ class HeadlineEmbeddingModel:
 
         return reversed_vector_list, vectors_list
 
-    def get_vectors(self, headline, pad_how_much=5):
+    def get_vectors(self, headline, pad_how_much=5, length = 10):
         if not isinstance(headline, list):
             raise ValueError("Headline should be a list of string")
         np.random.seed(111)
