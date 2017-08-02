@@ -19,7 +19,11 @@ GLOVE = DATADIR + "glove.840B.300d.txt"
 NEWS = DATADIR + "news.csv"
 
 
-def main():
+def main(gpu = False):
+    device = "/cpu:0"
+    if gpu:
+        device = "/gpu:0"
+
     word_indexes = WordsIndexes(DISTINCT, glove_file=GLOVE)
     headline_model = HeadlineEmbeddingModel(
         NEWS, processed=False, word_index_model=word_indexes, with_information=True)
@@ -36,35 +40,36 @@ def main():
     frame_dim = 300
     training_epochs = 100
 
-    # Placeholders
-    sequence_inputs = tf.placeholder(tf.float32, shape=[None, None, frame_dim])
-    decoder_inputs = tf.placeholder(tf.float32, shape=[None, None, frame_dim])
-    sequence_outputs = tf.placeholder(tf.float32, shape=[None, None, frame_dim])
+    with tf.device(device):
+        # Placeholders
+        sequence_inputs = tf.placeholder(tf.float32, shape=[None, None, frame_dim])
+        decoder_inputs = tf.placeholder(tf.float32, shape=[None, None, frame_dim])
+        sequence_outputs = tf.placeholder(tf.float32, shape=[None, None, frame_dim])
 
-    sequence_length = tf.placeholder(tf.int32, shape=[None, ])
+        sequence_length = tf.placeholder(tf.int32, shape=[None, ])
 
-    l2_reg = tf.placeholder(tf.float32, name="lambda_l2_reg")
-    is_training = tf.placeholder(tf.bool, name='is_training')
+        l2_reg = tf.placeholder(tf.float32, name="lambda_l2_reg")
+        is_training = tf.placeholder(tf.bool, name='is_training')
 
-    # Autoencoder model.
-    autoencoder = Autoencoder(sequence_inputs,
-                              sequence_outputs,
-                              decoder_inputs,
-                              frame_dim=frame_dim,
-                              batch_size=batch_size,
-                              hidden_size=hidden_layer_size,
-                              sequence_length=sequence_length,
-                              is_training=is_training,
-                              l2_regularization=l2_reg)
-    encoder_state, decoder_outputs = autoencoder.initialize_rnn()
-    loss, optimizer = autoencoder.loss(decoder_outputs)
-
-    init = tf.global_variables_initializer()
+        # Autoencoder model.
+        autoencoder = Autoencoder(sequence_inputs,
+                                  sequence_outputs,
+                                  decoder_inputs,
+                                  frame_dim=frame_dim,
+                                  batch_size=batch_size,
+                                  hidden_size=hidden_layer_size,
+                                  sequence_length=sequence_length,
+                                  is_training=is_training,
+                                  l2_regularization=l2_reg)
+        encoder_state, decoder_outputs = autoencoder.initialize_rnn()
+        loss, optimizer = autoencoder.loss(decoder_outputs)
+        init = tf.global_variables_initializer()
     saver = tf.train.Saver()
     prev_loss = None
     checkpoint = "./headline_encoder_ckpt/model.ckpt"
 
-    with tf.Session() as sess:
+    # with tf.Session() as sess:
+    with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
         sess.run(init)
         # saver.restore(sess, checkpoint)
         counter = 0
@@ -111,7 +116,7 @@ def main():
                 if (counter % display_step) == 0:
                     print("Ep: {}, Cost: {}.".format(epoch, cost))
                 counter += 1
-                
+
             if prev_loss == None:
                 saver.save(sess, checkpoint)
                 prev_loss = cost
@@ -126,4 +131,15 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = sys.args[1:]
+    gpu = False
+    try:
+        if args[0] == "gpu":
+            gpu = True
+        else:
+            gpu = False
+
+    except:
+        print("No parameters was set defaulting to cpu")
+
+    main(gpu = gpu)
