@@ -6,20 +6,20 @@ import numpy as np
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), os.path.pardir)))
 sys.path.append(
-    "/Users/udokanwosu/Documents/Tutorials/Dissertation/ComputationalInvesting/")
+    "/cs/home/un4/Documents/Dissertation/Project/ComputationalInvesting/")
 
 
 from utils.helper import *
 from DefaultAutoencoder import Autoencoder
 
 
-DATADIR = "/Users/udokanwosu/Documents/junk/ParseText/datafiles/"
+DATADIR = "/cs/home/un4/Documents/Dissertation/Data/"
 DISTINCT = DATADIR + "hl_distinct.txt"
 GLOVE = DATADIR + "glove.840B.300d.txt"
-NEWS = DATADIR + "news.csv"
+NEWS = DATADIR + "news_reuters.csv"
 
 
-def main(gpu = False):
+def main(use_gpu = False):
     device = "/cpu:0"
     if gpu:
         device = "/gpu:0"
@@ -36,7 +36,7 @@ def main(gpu = False):
     display_step = 100
     hidden_layer_size = 400
     # batch_size = 100
-    batch_size = 10 
+    batch_size = 10
     frame_dim = 300
     training_epochs = 100
 
@@ -63,15 +63,16 @@ def main(gpu = False):
                                   l2_regularization=l2_reg)
         encoder_state, decoder_outputs = autoencoder.initialize_rnn()
         loss, optimizer = autoencoder.loss(decoder_outputs)
-        init = tf.global_variables_initializer()
+    init = tf.global_variables_initializer()
     saver = tf.train.Saver()
     prev_loss = None
-    checkpoint = "./headline_encoder_ckpt/model.ckpt"
+    checkpoint = "./headline_encoder_ls/model.ckpt"
 
     # with tf.Session() as sess:
-    with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
-        sess.run(init)
-        # saver.restore(sess, checkpoint)
+    with tf.Session(config=tf.ConfigProto(log_device_placement=True,
+                                         allow_soft_placement = True)) as sess:
+        # sess.run(init)
+        saver.restore(sess, checkpoint)
         counter = 0
         for epoch in range(training_epochs):
             for index, items in enumerate(news.minibatch(batch_size)):
@@ -114,7 +115,7 @@ def main(gpu = False):
                 summary, cost = sess.run([optimizer, loss], feed_dict=feed_dict)
 
                 if (counter % display_step) == 0:
-                    print("Ep: {}, Cost: {}.".format(epoch, cost))
+                    print("Ep: {}, Item {} Cost: {}.".format(epoch, (counter * index), cost))
                 counter += 1
 
             if prev_loss == None:
@@ -131,7 +132,8 @@ def main(gpu = False):
 
 
 if __name__ == "__main__":
-    args = sys.args[1:]
+    args = sys.argv[1:]
+    # print("Args are ", args)
     gpu = False
     try:
         if args[0] == "gpu":
@@ -142,4 +144,4 @@ if __name__ == "__main__":
     except:
         print("No parameters was set defaulting to cpu")
 
-    main(gpu = gpu)
+    main(use_gpu = gpu)

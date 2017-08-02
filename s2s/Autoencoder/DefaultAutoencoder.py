@@ -44,7 +44,7 @@ class Autoencoder:
         #     [tf.zeros_like(dec_values[0], name="GO")] + dec_values[:-1])
         # self.decoder_inputs = tf.stack(decoder_inputs)
 
-    def initialize_rnn(self, rnn_type="GRU"):
+    def initialize_rnn(self, rnn_type="LSTM"):
         with tf.variable_scope("rnn_encoder",
                                initializer=tf.contrib.layers.variance_scaling_initializer(seed=2)):
             if rnn_type == "GRU":
