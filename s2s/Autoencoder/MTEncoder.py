@@ -18,6 +18,7 @@ DATADIR = "/cs/home/un4/Documents/Dissertation/Data/"
 DISTINCT = DATADIR + "hl_distinct.txt"
 GLOVE = DATADIR + "glove.840B.300d.txt"
 NEWS = DATADIR + "news_reuters.csv"
+ENCODED_HEADLINES = DATADIR + "encoded_headlines_dummy.csv"
 
 print("Initializing word indexes")
 word_indexes = WordsIndexes(DISTINCT, GLOVE)
@@ -43,10 +44,13 @@ decoding_embedding_size = 300
 
 
 learning_rate = 0.001
+decay_rate = 0.999
+keep_prob = 0.3
 
 
 def get_model_inputs():
     input_data = tf.placeholder(tf.int32, [None, None], name='input')
+    # input_data = tf.contrib.layers.dropout(input_data, keep_prob = keep_prob)
     targets = tf.placeholder(tf.int32, [None, None], name='targets')
     lr = tf.placeholder(tf.float32, name='learning_rate')
 
@@ -186,7 +190,7 @@ def seq2seq_model(input_data, targets, lr,
                                                                 max_target_sequence_length,
                                                                 enc_state,
                                                                 dec_input)
-    return training_decoder_output, inference_decoder
+    return enc_state, training_decoder_output, inference_decoder
 
 
 def pad_sentence_batch(sentence_batch, padint):
@@ -224,7 +228,7 @@ def main():
       with train_graph.as_default():
           input_data, targets, lr, target_sequence_length, max_target_sequence_length, source_sequence_length = get_model_inputs()
 
-          training_decoder_output, inference_decoder_output = seq2seq_model(input_data,
+          encoder_states, training_decoder_output, inference_decoder_output = seq2seq_model(input_data,
                                                                             targets,
                                                                             lr,
                                                                             target_sequence_length,
@@ -273,16 +277,17 @@ def main():
 
       display_step = 20  # Check training loss after every 20 batches
 
-      checkpoint = "./checkpoints/headlines_encoder_mt2/model.ckpt"
-      restore_checkpoint = "./checkpoints/headlines_encoder_mt/model.ckpt"
+      checkpoint = "./checkpoints/headlines_encoder_mt/model.ckpt"
+    #   restore_checkpoint = "./checkpoints/headlines_encoder_mt/model.ckpt"
       device = "/gpu:0"
       previous_loss = None
       predict = True
-    with tf.Session(graph=train_graph, config=tf.ConfigProto(log_device_placement=True)) as sess:
+    with tf.Session(graph=train_graph, config=tf.ConfigProto(log_device_placement=True, allow_soft_placement=True)) as sess:
+        # sess.run(tf.global_variables_initializer())
+        saver = tf.train.Saver()
         if not predict:
-            # sess.run(tf.global_variables_initializer())
-            saver = tf.train.Saver()
-            saver.restore(sess, restore_checkpoint)
+            sess.run(tf.global_variables_initializer())
+            # saver.restore(sess, checkpoint)
             for epoch_i in range(1, epochs + 1):
                 for batch_i, (targets_batch, sources_batch, targets_lengths, sources_lengths) in enumerate(
                         get_batches(train_target, train_source, batch_size,
@@ -316,18 +321,57 @@ def main():
                                       loss,
                                       validation_loss[0]))
                 if previous_loss == None:
+                    print("Saved")
                     saver.save(sess, checkpoint)
-                    previous_loss = validation_loss
+                    previous_loss = validation_loss[0]
                 else:
-                    if previous_loss > validation_loss:
+                    if previous_loss > validation_loss[0]:
+                        print("Saved")
                         saver.save(sess, checkpoint)
-                        previous_loss = validation_loss
+                        previous_loss = validation_loss[0]
         else:
-            news_model = News(NEWS, word_index_model = word_index_model)
+            saver.restore(sess, checkpoint)
+            news_model = News(NEWS, word_index_model = word_indexes)
+            with open(ENCODED_HEADLINES, "w") as encoded_headlines_file:
+                for batch in news_model.auto_encoder_minibatch(1):
+                    date, ticker, vector_indexes = list(batch)[0]
+                    # print(len(vector_indexes))
+                    # print(np.array(vector_indexes))
+                    sequence_length = np.array([len(vector_indexes)])
+                    # print(sequence_length)
+                    inputs = np.expand_dims(np.array(vector_indexes), axis=0)
+                    feed = {
+                         input_data: inputs,
+                        #  targets: targets_batch,
+                         lr: learning_rate,
+                         target_sequence_length: sequence_length,
+                         source_sequence_length: sequence_length
+                     }
+                    encoder_inputs = sess.run([encoder_states], feed_dict = feed)
 
-            for batch in news_model.auto_encoder_minibatch(1):
-                value = list(list(item)[0])
-                print(value)
+                    # print(encoder_inputs)
+                    # print(len(encoder_inputs))
+                    # print(len(encoder_inputs[0]))
+                    # first_encoded_inputs = encoder_inputs[0][0].h
+                    top_encoded_inputs = encoder_inputs[0][1].h[0].tolist()
+                    print(len(top_encoded_inputs))
+                    sys.exit(1)
+                    # print(type(top_encoded_inputs))
+                    # print(top_encoded_inputs)
+                    top_encoded_inputs = " ".join(list(map(str,top_encoded_inputs)))
+                    formatted_encoded_string = "{},{},{}\n".format(date, ticker, top_encoded_inputs)
+                    encoded_headlines_file.write(formatted_encoded_string)
+                    # print(first_encoded_inputs)
+                    # print(top_encoded_inputs)
+                    # print(encoder_inputs[1].h)
+                    # break
+
+        if False == True:
+            loaded_graph = tf.Graph()
+            with tf.Session() as sess:
+                loader = tf.train.import_meta_graph(checkpoint_path )
+
+        print("Done Optimization and saving.")
         # Save Model
         # saver = tf.train.Saver()
         # saver.save(sess, checkpoint)

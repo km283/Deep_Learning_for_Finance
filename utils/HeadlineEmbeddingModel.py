@@ -3,11 +3,15 @@ import re
 import nltk
 import numpy as np
 
-from utils.helper import HeadlineParser, CSVParser
+from utils.helper import HeadlineParser, CSVParser, Padder
 
 class HeadlineEmbeddingModel:
 
-    def __init__(self, filename, processed=True, word_index_model=None, with_information=False):
+    def __init__(self,
+                filename,
+                processed=True,
+                word_index_model=None,
+                with_information=False):
         """
         Reads the news headline and then returns a vector of those values.
         filename: this represents the file name of the file.
@@ -47,6 +51,10 @@ class HeadlineEmbeddingModel:
                 else:
                     indexed_headlines.append(indexes)
         return indexed_headlines
+
+    def minibatch(self, train_set):
+        pass
+
 
     def pad_sentence_vector(self, sentence_vector_list, padint=0, padding_length=54, dimension=300, reverse=False):
         """
@@ -114,7 +122,7 @@ class HeadlineEmbeddingModel:
         wordmodel: the word model containint the word2index.
         """
         if not isinstance(line, list):
-            print(type(line))
+            # print(type(line))
             raise ValueError("line needs to be a list")
         unk = self.word_index_model.word_indexes.get("<UNK>")
         return list(map(lambda x: self.word_index_model.word_indexes.get(x, unk), line))

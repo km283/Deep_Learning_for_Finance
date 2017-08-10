@@ -1,4 +1,4 @@
-import sys, os.path 
+import sys, os.path
 # sys.path.append(
 #     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
@@ -24,4 +24,4 @@ class Model:
         raise NotImplementedError("You need to implement this feature")
 
     def minibatch(self, batch_size):
-        raise NotImplementedError("This method needs to be implemented") 
+        raise NotImplementedError("This method needs to be implemented")
