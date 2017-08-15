@@ -212,5 +212,64 @@ Methodology: the paper uses a training sample from  January 1965 to December 198
 Regarding the neural network architecture, whilst the author notes that he uses stacked restricted Boltzmann machines for encoding the original input (33 input parameters - concatenated monthly returns and daily returns) before passing resulting outputted results through a fully connected neural network, in essence the entire procedure may be viewed as a neural network with an expanding then contracting and finally expanding node structure ('e five-layer network 33−40−4−50−2 consisting of an encoder that takes 33 inputs and reduces them to a 4 dimensional code and a classifier that takes these 4 inputs and outputs the probabilities for the two classes'). 
 
 
-
+<table class="table">
+  <thead>
+    <tr>
+        <th>Classifier</th>
+        <th>Accuracy</th>
+        <th>Training Time</th>
+        <th>Testing Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+		<td>AdaBoost</td>
+		<td style="text-align: right" class="danger">48.57%</td>
+		<td style="text-align: right" >22.7807s</td>
+		<td style="text-align: right" >0.1147s</td>
+    </tr>
+    <tr>
+		<td>Decision Tree</td>
+		<td style="text-align: right" class="danger">48.78%</td>
+		<td style="text-align: right" >1.9171s</td>
+		<td style="text-align: right" ><b>0.0015s</b></td>
+    </tr>
+    <tr>
+		<td>LDA</td>
+		<td style="text-align: right" class="danger"><b>48.80%</b></td>
+		<td style="text-align: right" >0.4013s</td>
+		<td style="text-align: right" >0.0025s</td>
+    </tr>
+    <tr>
+		<td>Naive Bayes</td>
+		<td style="text-align: right" class="danger">46.67%</td>
+		<td style="text-align: right" >0.0259s</td>
+		<td style="text-align: right" >0.0077s</td>
+    </tr>
+    <tr>
+		<td>QDA</td>
+		<td style="text-align: right" class="danger">47.20%</td>
+		<td style="text-align: right" >0.4578s</td>
+		<td style="text-align: right" >0.0111s</td>
+    </tr>
+    <tr>
+		<td>Random Forest</td>
+		<td style="text-align: right" class="danger">46.91%</td>
+		<td style="text-align: right" >5.6473s</td>
+		<td style="text-align: right" >3.1672s</td>
+    </tr>
+    <tr>
+		<td>Random Forest 2</td>
+		<td style="text-align: right" class="danger">46.46%</td>
+		<td style="text-align: right" >0.1595s</td>
+		<td style="text-align: right" >3.1585s</td>
+    </tr>
+    <tr>
+		<td>k nn</td>
+		<td style="text-align: right" class="danger">40.25%</td>
+		<td style="text-align: right" >1.1687s</td>
+		<td style="text-align: right" class="danger">13.1979s</td>
+    </tr>
+</tbody>
+</table>
 
