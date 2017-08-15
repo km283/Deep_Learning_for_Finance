@@ -211,7 +211,7 @@ summary: this paper discusses exploiting the momentum trading strategy (buying t
 Methodology: the paper uses a training sample from  January 1965 to December 1989 and a test sample up to 2009. The analyses is restricted  'to ordinary shares trading on NYSE, AMEX, or Nasdaq', with a closing monthly price higher than $5. Both monthly returns and daily returns are considered, with returns adjusted cross sectionally to z scores (like weighing a companies performance that month/day with respect to all other companies). This is done to capture the relevant information required for exploiting momentum trading.
 Regarding the neural network architecture, whilst the author notes that he uses stacked restricted Boltzmann machines for encoding the original input (33 input parameters - concatenated monthly returns and daily returns) before passing resulting outputted results through a fully connected neural network, in essence the entire procedure may be viewed as a neural network with an expanding then contracting and finally expanding node structure ('e five-layer network 33−40−4−50−2 consisting of an encoder that takes 33 inputs and reduces them to a 4 dimensional code and a classifier that takes these 4 inputs and outputs the probabilities for the two classes'). 
 
-
+RNN CNN 20 dim encoded technicals
 <table class="table">
   <thead>
     <tr>
@@ -273,11 +273,4 @@ Regarding the neural network architecture, whilst the author notes that he uses 
 </tbody>
 </table>
 
-Classifier: QDA
-Training time: 0.4578s
-Testing time: 0.0111s
-Confusion matrix:
-[[ 123  701   92]
- [ 102 1572   79]
- [ 150  883   99]]
-Accuracy: 0.4720
+
