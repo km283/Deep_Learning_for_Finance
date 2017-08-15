@@ -273,3 +273,11 @@ Regarding the neural network architecture, whilst the author notes that he uses 
 </tbody>
 </table>
 
+Classifier: QDA
+Training time: 0.4578s
+Testing time: 0.0111s
+Confusion matrix:
+[[ 123  701   92]
+ [ 102 1572   79]
+ [ 150  883   99]]
+Accuracy: 0.4720
