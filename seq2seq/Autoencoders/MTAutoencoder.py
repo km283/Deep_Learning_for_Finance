@@ -65,9 +65,12 @@ class MTNN:
                     source_sequence_length
 
     def make_cell(self, size, type="LSTM"):
+        # cell = tf.contrib.rnn.LSTMCell(size, initializer =
+        #             tf.contrib.layers.variance_scaling_initializer(seed=2),
+        #             activation = tf.nn.elu)
         cell = tf.contrib.rnn.LSTMCell(size, initializer =
-                    tf.contrib.layers.variance_scaling_initializer(seed=2),
-                    activation = tf.nn.elu)
+                    tf.contrib.layers.variance_scaling_initializer())
+
         return cell
 
     def create_encoder(self):

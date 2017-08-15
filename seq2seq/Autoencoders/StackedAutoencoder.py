@@ -49,7 +49,7 @@ class StackedAutoencoder:
 
 
 
-    def initialize_rnn(self, activation = None):
+    def initialize_rnn(self, activation = tf.nn.elu):
         with tf.variable_scope("rnn_encoder",
                                initializer=tf.contrib.layers.variance_scaling_initializer(seed=2)):
             encoder_multi_rnn_cell = self.make_multi_cell(self.num_layers,

@@ -42,16 +42,17 @@ class News:
     def process_lines(self, lines):
         return list(map(lambda x : x.strip(), lines))
 
-    def parse_news_line(self, line, to_vector = False):
-        items = CSVParser.parse(line)
-        date = items[2]
-        ticker = items[0]
-        headline = self.tokenizer.parse(items[3])
-        # print(headline)
-        if to_vector:
-            unk = self.word_index_model.word_indexes.get("<UNK>")
-            headline = list(map(lambda x: self.word_index_model.word_indexes.get(x, unk), headline))
-        return date, ticker, headline
+    # def parse_news_line(self, line, to_vector = False):
+    #     items = CSVParser.parse(line)
+    #     date = items[2]
+    #     ticker = items[0]
+    #     headline = self.tokenizer.parse(items[3])
+    #     # print(headline)
+    #     if to_vector:
+    #         unk = self.word_index_model.word_indexes.get("<UNK>")
+    #         headline = list(map(lambda x: self.word_index_model.word_indexes.get(x, unk), headline))
+    #         print(headline)
+    #     return date, ticker, headline
 
     def initialize(self):
         train = []
@@ -61,7 +62,7 @@ class News:
             date, ticker, headline = self.parse_news_line(line, to_vector = True)
             if date in self.training_dates:
                 train.append((date, ticker, headline))
-            elif date in self.test_dates:
+            elif date in self.validation_dates:
                 val.append((date, ticker, headline))
             else:
                 test.append((date, ticker, headline))
@@ -80,6 +81,7 @@ class News:
         if to_vector:
             unk = self.word_index_model.word_indexes.get("<UNK>")
             headline = list(map(lambda x: self.word_index_model.word_indexes.get(x, unk), headline))
+            # print(list( map (lambda x: headline[0] == x, headline)))
         return date, ticker, headline
 
     def minibatch(self, item, batch_size):

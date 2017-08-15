@@ -9,6 +9,7 @@ sys.path.append(
     "/cs/home/un4/Documents/Dissertation/Project/ComputationalInvesting/")
 
 
+from utils.config import KDATADIR, DATADIR, SUMDIR
 from utils.helper import *
 from utils.WordIndexes import WordsIndexes
 from utils.News import News
@@ -18,20 +19,16 @@ from StackedAutoencoder import StackedAutoencoder
 
 
 
-DATADIR = "/cs/home/un4/Documents/Dissertation/Data/"
 DISTINCT = DATADIR + "hl_distinct.txt"
 GLOVE = DATADIR + "glove.840B.300d.txt"
 NEWS = DATADIR + "news_reuters.csv"
-ENCODED_HEADLINES = DATADIR + "encoded_headlines_least_squares_vanilla_train.csv"
 
-KDATADIR = "/cs/home/un4/Documents/Krystof_Folder/"
 TRAIN = KDATADIR + "training_dates.csv"
 VAL = KDATADIR + "validation_dates.csv"
 TEST = KDATADIR + "testing_dates.csv"
 
-SUMDIR = "/cs/home/un4/Documents/Dissertation/Project/ComputationalInvesting/"
-SUMMARYDIR = SUMDIR + "summaries/ls_dec/"
-CHECKPOINT = SUMDIR + "checkpoints/ls_dec/model.ckpt"
+SUMMARYDIR = SUMDIR + "summaries/lshl/"
+CHECKPOINT = SUMDIR + "checkpoints/lshl/"
 
 def main(use_gpu = False):
     device = "/cpu:0"
@@ -50,8 +47,9 @@ def main(use_gpu = False):
     learning_rate = 0.0001
     training_epochs = 10000
     display_step = 100
+    predicted = True
     # batch_size_param = 32
-    batch_size_param = 32
+    batch_size_param = 32 if not predicted else 1
     frame_dim = 300
 
     # hidden_layer_size = 400
@@ -79,9 +77,10 @@ def main(use_gpu = False):
         encoder_state, decoder_outputs = autoencoder.initialize_rnn()
         loss, optimizer = autoencoder.loss(decoder_outputs)
     init = tf.global_variables_initializer()
-    saver = tf.train.Saver()
+    # saver = tf.train.Saver()
+    saver = tf.train.Saver(max_to_keep=4)
+    latest_checkpoint = tf.train.latest_checkpoint(CHECKPOINT)
     prev_loss = None
-    # checkpoint = "./headline_encoder_ls/model.ckpt"
 
     def getvalues(items):
         headlines = list(map(lambda x: x[2], items))
@@ -125,20 +124,19 @@ def main(use_gpu = False):
     mse = 99999
     val_loss_count = 0
     prev_val_loss = 9999
-    tf.summary.scalar("val_loss ", prev_val_loss)
-    tf.summary.scalar("loss", loss)
-    # tf.summary.scalar("mse loss", mse_losses)
+    training_loss = tf.summary.scalar("loss", loss)
+    val_loss = tf.summary.scalar("val_loss", loss)
     merged = tf.summary.merge_all()
-    predicted = True
 
     with tf.Session(config=tf.ConfigProto(log_device_placement=True,
                                          allow_soft_placement = True)) as sess:
 
         if not predicted:
             summary_writer = tf.summary.FileWriter(SUMMARYDIR, sess.graph)
-            # sess.run(init)
+            sess.run(init)
             # saver.restore(sess, CHECKPOINT)
             counter = 0
+            batch_counter = 0
             for epoch in range(training_epochs):
                 for index, items in enumerate(news.minibatch(news.train, batch_size_param)):
                     # GetHeadlines --> Get sequence length --> Convert to Vectors -->
@@ -154,8 +152,7 @@ def main(use_gpu = False):
                         l2_reg: 0.3
                     }
                     summary, cost , merged_summary = sess.run([optimizer, loss, merged], feed_dict=feed_dict)
-                    summary_writer.add_summary(summary, (counter * epoch))
-                    summary_writer.add_summary(merged_summary, (counter * epoch))
+                    # summary_writer.add_summary(merged_summary, batch_counter)
                     # Checking for validation loss
                     if counter % display_step == 0:
                         val_mse = []
@@ -168,12 +165,14 @@ def main(use_gpu = False):
                                         sequence_length: val_seq_vec_len,
                                         l2_reg: 0.
                             }
-                            validation_loss = sess.run([loss], feed_dict = val_feed_dict)
-                            val_mse.append(validation_loss[0])
+                            validation_loss, m, vl = sess.run([val_loss, merged, loss], feed_dict = val_feed_dict)
+                            # summary_writer.add_summary(summary, batch_counter)
+                            # summary_writer.add_summary(validation_loss, batch_counter)
+                            # summary_writer.add_summary(m, batch_counter)
+                            val_mse.append(vl)
+                            batch_counter += 1
                         # total_mse = sum(losses)/float(len(losses)) if len(losses) > 0 else cost
-
                         validation_mse = sum(val_mse) / float(len(val_mse))
-
                         print("Ep: {}, Item {} Cost: {}. Validation MSE {}".format(
                                             epoch, (index * batch_size_param), cost, validation_mse))
 
@@ -181,7 +180,7 @@ def main(use_gpu = False):
                             val_loss_count += 1
                         else:
                             print("Saving Prev {}, Current {}.".format(prev_val_loss, validation_mse))
-                            saver.save(sess, CHECKPOINT)
+                            saver.save(sess, CHECKPOINT, global_step=batch_counter)
                             prev_val_loss = validation_mse
                             val_loss_count = 0
 
@@ -195,27 +194,31 @@ def main(use_gpu = False):
                 print("Epoch {}, Total MSE {}.".format(epoch, mse))
         else:
             print("Shit")
-            saver.restore(sess, CHECKPOINT)
-            with open(ENCODED_HEADLINES, "w") as encoded_headlines:
-                for item in news.minibatch(news.train, 1):
+            saver.restore(sess, latest_checkpoint)
+            fileitems = {
+            "least_sq_train.csv": news.train,
+             "least_sq_val.csv": news.val,
+             "least_sq_test.csv": news.test
+             }
 
-                    date, ticker, seq_len, inputs, outputs = get_prediction_values(item[0])
-                    # print(date, ticker, inputs.shape)
-                    # sys.exit(1)
-                    feed_dict = {
-                                    sequence_inputs: inputs,
-                                    is_training: False,
-                                    sequence_length: seq_len,
-                                    # l2_reg: 0.
-                        }
-                    encoder_inputs = sess.run([encoder_state], feed_dict = feed_dict)
-                    # print(encoder_inputs[0])
-                    # print(date, ticker)
-                    top_encoded_inputs = encoder_inputs[0][0].h[0].tolist()
-                    top_encoded_inputs = " ".join(list(map(str,top_encoded_inputs)))
-                    formatted_encoded_string = "{},{},{}\n".format(date, ticker, top_encoded_inputs)
-                    encoded_headlines.write(formatted_encoded_string)
-        print("Finished Encoding to {}".format(ENCODED_HEADLINES))
+            for k, v in fileitems.items():
+                ps = ""
+                with open(DATADIR + k, "w") as encoded_headlines:
+                    for item in news.minibatch(v, batch_size_param):
+                        date, ticker, seq_len, pinputs, poutputs = get_prediction_values(item[0])
+                        feed_dict = {
+                                        sequence_inputs: pinputs,
+                                        is_training: False,
+                                        sequence_length: seq_len,
+                            }
+                        encoder_inputs = sess.run([encoder_state], feed_dict = feed_dict)
+                        top_encoded_inputs = encoder_inputs[0][0].h[0].tolist()
+                        top_encoded_inputs = " ".join(list(map(str,top_encoded_inputs)))
+                        print(top_encoded_inputs == ps)
+                        ps = top_encoded_inputs
+                        formatted_encoded_string = "{},{},{}\n".format(date, ticker, top_encoded_inputs)
+                        encoded_headlines.write(formatted_encoded_string)
+                print("Finished Encoding to {}".format(k))
 
 
 if __name__ == "__main__":
