@@ -814,73 +814,70 @@ Accuracy: 0.4783
 </tbody>
 </table>
 
-RESULTS USINF 15 DIM KRYSTOF ENCODED TEHCNICALS:
 Got 60242 training samples and 3801 test samples.
 ################################################################################
 Start fitting 'Logistic Regression (C=1)' classifier.
 Classifier: Logistic Regression (C=1)
-Training time: 0.8564s
-Testing time: 0.0072s
+Training time: 0.8292s
+Testing time: 0.0212s
 Confusion matrix:
-[[ 170  683   63]
- [  87 1626   40]
- [ 166  895   71]]
-Accuracy: 0.4912
+[[   1  915    0]
+ [   1 1752    0]
+ [   0 1132    0]]
+Accuracy: 0.4612
 ################################################################################
 Start fitting 'Logistic Regression (C=1000)' classifier.
 Classifier: Logistic Regression (C=1000)
-Training time: 1.0104s
-Testing time: 0.0015s
-Confusion matrix:
-[[ 170  683   63]
- [  87 1626   40]
- [ 166  895   71]]
-Accuracy: 0.4912
-################################################################################
-Start fitting 'RBM 200, n_iter=40, LR=0.01, Reg: C=1' classifier.
-Classifier: RBM 200, n_iter=40, LR=0.01, Reg: C=1
-Training time: 74.9017s
-Testing time: 0.0182s
+Training time: 1.5541s
+Testing time: 0.0014s
 Confusion matrix:
 [[   0  916    0]
- [   0 1752    1]
+ [   0 1753    0]
  [   0 1132    0]]
-Accuracy: 0.4609
+Accuracy: 0.4612
 ################################################################################
-Start fitting 'RBM 200, n_iter=40, LR=0.01, Reg: C=10000' classifier.
-Classifier: RBM 200, n_iter=40, LR=0.01, Reg: C=10000
-Training time: 75.5168s
-Testing time: 0.0181s
+Classifier: RBM 200, n_iter=40, LR=0.01, Reg: C=1
+Training time: 80.8919s
+Testing time: 0.0200s
 Confusion matrix:
-[[   0  915    1]
- [   0 1752    1]
- [   0 1131    1]]
+[[   0  916    0]
+ [   0 1753    0]
+ [   0 1132    0]]
+Accuracy: 0.4612
+################################################################################
+Classifier: RBM 200, n_iter=40, LR=0.01, Reg: C=10000
+Training time: 81.0430s
+Testing time: 0.0205s
+Confusion matrix:
+[[   0  916    0]
+ [   0 1753    0]
+ [   0 1132    0]]
 Accuracy: 0.4612
 ################################################################################
 Start fitting 'RBM 100' classifier.
 Classifier: RBM 100
-Training time: 9.0881s
-Testing time: 0.0106s
+Training time: 8.6977s
+Testing time: 0.0108s
 Confusion matrix:
-[[   0  915    1]
+[[   0  916    0]
  [   0 1753    0]
- [   1 1131    0]]
+ [   0 1132    0]]
 Accuracy: 0.4612
 ################################################################################
 Start fitting 'RBM 100, n_iter=20' classifier.
 Classifier: RBM 100, n_iter=20
-Training time: 16.9482s
-Testing time: 0.0105s
+Training time: 16.6849s
+Testing time: 0.0108s
 Confusion matrix:
 [[   0  916    0]
- [   0 1752    1]
+ [   0 1753    0]
  [   0 1132    0]]
-Accuracy: 0.4609
+Accuracy: 0.4612
 ################################################################################
 Start fitting 'RBM 256' classifier.
 Classifier: RBM 256
-Training time: 17.1725s
-Testing time: 0.0216s
+Training time: 15.9381s
+Testing time: 0.0226s
 Confusion matrix:
 [[   0  916    0]
  [   0 1753    0]
@@ -889,8 +886,8 @@ Accuracy: 0.4612
 ################################################################################
 Start fitting 'RBM 512, n_iter=100' classifier.
 Classifier: RBM 512, n_iter=100
-Training time: 31.0654s
-Testing time: 0.0415s
+Training time: 28.2213s
+Testing time: 0.0419s
 Confusion matrix:
 [[   0  916    0]
  [   0 1753    0]
@@ -900,103 +897,103 @@ Accuracy: 0.4612
 Start fitting 'SVM, adj.' classifier.
 
 Classifier: SVM, adj.
-Training time: 229.2236s
-Testing time: 6.5703s
+Training time: 187.9059s
+Testing time: 6.2480s
 Confusion matrix:
-[[ 127  748   41]
- [  49 1685   19]
- [ 119  973   40]]
-Accuracy: 0.4872
+[[   0  916    0]
+ [   1 1752    0]
+ [   3 1129    0]]
+Accuracy: 0.4609
 ################################################################################
 Start fitting 'SVM, linear' classifier.
 Classifier: SVM, linear
-Training time: 118.8851s
-Testing time: 2.7688s
+Training time: 78.1818s
+Testing time: 2.3537s
 Confusion matrix:
-[[  90  813   13]
- [  30 1716    7]
- [  89 1030   13]]
-Accuracy: 0.4786
+[[   0  916    0]
+ [   0 1753    0]
+ [   0 1132    0]]
+Accuracy: 0.4612
 ################################################################################
 Start fitting 'k nn' classifier.
 Classifier: k nn
-Training time: 0.0575s
-Testing time: 1.1715s
+Training time: 0.0474s
+Testing time: 0.0502s
 Confusion matrix:
-[[359 352 205]
- [528 957 268]
- [408 502 222]]
-Accuracy: 0.4046
+[[342 404 170]
+ [645 792 316]
+ [446 469 217]]
+Accuracy: 0.3554
 ################################################################################
 Start fitting 'Decision Tree' classifier.
 Classifier: Decision Tree
-Training time: 0.5653s
+Training time: 0.4262s
 Testing time: 0.0017s
 Confusion matrix:
-[[ 126  723   67]
- [  53 1657   43]
- [ 126  932   74]]
-Accuracy: 0.4886
+[[  24  847   45]
+ [  17 1697   39]
+ [  35 1048   49]]
+Accuracy: 0.4657
 ################################################################################
 Start fitting 'Random Forest' classifier.
 Classifier: Random Forest
-Training time: 3.4770s
-Testing time: 3.0867s
+Training time: 4.0751s
+Testing time: 3.0953s
 Confusion matrix:
-[[ 166  600  150]
- [ 142 1448  163]
- [ 194  773  165]]
-Accuracy: 0.4680
+[[200 508 208]
+ [382 991 380]
+ [252 624 256]]
+Accuracy: 0.3807
 ################################################################################
 Start fitting 'Random Forest 2' classifier.
 Classifier: Random Forest 2
-Training time: 0.1120s
-Testing time: 3.1413s
+Training time: 0.1278s
+Testing time: 3.1354s
 Confusion matrix:
-[[  95  776   45]
- [  45 1686   22]
- [ 101  989   42]]
-Accuracy: 0.4796
+[[  29  884    3]
+ [  24 1728    1]
+ [  29 1102    1]]
+Accuracy: 0.4625
 ################################################################################
 Start fitting 'AdaBoost' classifier.
 Classifier: AdaBoost
-Training time: 6.7727s
-Testing time: 0.1176s
+Training time: 5.1463s
+Testing time: 0.1178s
 Confusion matrix:
-[[ 145  702   69]
- [  89 1628   36]
- [ 164  898   70]]
-Accuracy: 0.4849
+[[  33  868   15]
+ [  28 1715   10]
+ [  47 1075   10]]
+Accuracy: 0.4625
 ################################################################################
 Start fitting 'Naive Bayes' classifier.
 Classifier: Naive Bayes
-Training time: 0.0160s
-Testing time: 0.0051s
+Training time: 0.0136s
+Testing time: 0.0048s
 Confusion matrix:
-[[ 282  546   88]
- [ 262 1382  109]
- [ 338  683  111]]
-Accuracy: 0.4670
+[[  69   11  836]
+ [  61   31 1661]
+ [  86   30 1016]]
+Accuracy: 0.2936
 ################################################################################
 Start fitting 'LDA' classifier.
 Classifier: LDA
-Training time: 0.0666s
-Testing time: 0.0014s
+Training time: 0.0630s
+Testing time: 0.0013s
 Confusion matrix:
-[[ 173  680   63]
- [  93 1613   47]
- [ 170  881   81]]
-Accuracy: 0.4912
+[[   0  916    0]
+ [   0 1753    0]
+ [   0 1132    0]]
+Accuracy: 0.4612
 ################################################################################
 Start fitting 'QDA' classifier.
 Classifier: QDA
-Training time: 0.0344s
-Testing time: 0.0053s
+Training time: 0.0271s
+Testing time: 0.0050s
 Confusion matrix:
-[[ 164  645  107]
- [ 105 1559   89]
- [ 186  851   95]]
-Accuracy: 0.4783
+[[  31  211  674]
+ [  29  562 1162]
+ [  50  246  836]]
+Accuracy: 0.3760
 <table class="table">
   <thead>
     <tr>
@@ -1009,112 +1006,113 @@ Accuracy: 0.4783
   <tbody>
     <tr>
 		<td>AdaBoost</td>
-		<td style="text-align: right" class="danger">48.49%</td>
-		<td style="text-align: right" >6.7727s</td>
-		<td style="text-align: right" >0.1176s</td>
+		<td style="text-align: right" class="danger">46.25%</td>
+		<td style="text-align: right" >5.1463s</td>
+		<td style="text-align: right" >0.1178s</td>
     </tr>
     <tr>
 		<td>Decision Tree</td>
-		<td style="text-align: right" class="danger">48.86%</td>
-		<td style="text-align: right" >0.5653s</td>
+		<td style="text-align: right" class="danger"><b>46.57%</b></td>
+		<td style="text-align: right" >0.4262s</td>
 		<td style="text-align: right" >0.0017s</td>
     </tr>
     <tr>
 		<td>LDA</td>
-		<td style="text-align: right" class="danger"><b>49.12%</b></td>
-		<td style="text-align: right" >0.0666s</td>
-		<td style="text-align: right" ><b>0.0014s</b></td>
+		<td style="text-align: right" class="danger">46.12%</td>
+		<td style="text-align: right" >0.0630s</td>
+		<td style="text-align: right" ><b>0.0013s</b></td>
     </tr>
     <tr>
 		<td>Logistic Regression (C=1)</td>
-		<td style="text-align: right" class="danger"><b>49.12%</b></td>
-		<td style="text-align: right" >0.8564s</td>
-		<td style="text-align: right" >0.0072s</td>
+		<td style="text-align: right" class="danger">46.12%</td>
+		<td style="text-align: right" >0.8292s</td>
+		<td style="text-align: right" >0.0212s</td>
     </tr>
     <tr>
 		<td>Logistic Regression (C=1000)</td>
-		<td style="text-align: right" class="danger"><b>49.12%</b></td>
-		<td style="text-align: right" >1.0104s</td>
-		<td style="text-align: right" >0.0015s</td>
+		<td style="text-align: right" class="danger">46.12%</td>
+		<td style="text-align: right" >1.5541s</td>
+		<td style="text-align: right" >0.0014s</td>
     </tr>
     <tr>
 		<td>Naive Bayes</td>
-		<td style="text-align: right" class="danger">46.70%</td>
-		<td style="text-align: right" >0.0160s</td>
-		<td style="text-align: right" >0.0051s</td>
+		<td style="text-align: right" class="danger">29.36%</td>
+		<td style="text-align: right" >0.0136s</td>
+		<td style="text-align: right" >0.0048s</td>
     </tr>
     <tr>
 		<td>QDA</td>
-		<td style="text-align: right" class="danger">47.83%</td>
-		<td style="text-align: right" >0.0344s</td>
-		<td style="text-align: right" >0.0053s</td>
+		<td style="text-align: right" class="danger">37.60%</td>
+		<td style="text-align: right" >0.0271s</td>
+		<td style="text-align: right" >0.0050s</td>
     </tr>
     <tr>
 		<td>RBM 100</td>
 		<td style="text-align: right" class="danger">46.12%</td>
-		<td style="text-align: right" >9.0881s</td>
-		<td style="text-align: right" >0.0106s</td>
+		<td style="text-align: right" >8.6977s</td>
+		<td style="text-align: right" >0.0108s</td>
     </tr>
     <tr>
 		<td>RBM 100, n_iter=20</td>
-		<td style="text-align: right" class="danger">46.09%</td>
-		<td style="text-align: right" >16.9482s</td>
-		<td style="text-align: right" >0.0105s</td>
+		<td style="text-align: right" class="danger">46.12%</td>
+		<td style="text-align: right" >16.6849s</td>
+		<td style="text-align: right" >0.0108s</td>
     </tr>
     <tr>
 		<td>RBM 200, n_iter=40, LR=0.01, Reg: C=1</td>
-		<td style="text-align: right" class="danger">46.09%</td>
-		<td style="text-align: right" >74.9017s</td>
-		<td style="text-align: right" >0.0182s</td>
+		<td style="text-align: right" class="danger">46.12%</td>
+		<td style="text-align: right" >80.8919s</td>
+		<td style="text-align: right" >0.0200s</td>
     </tr>
     <tr>
 		<td>RBM 200, n_iter=40, LR=0.01, Reg: C=10000</td>
 		<td style="text-align: right" class="danger">46.12%</td>
-		<td style="text-align: right" >75.5168s</td>
-		<td style="text-align: right" >0.0181s</td>
+		<td style="text-align: right" >81.0430s</td>
+		<td style="text-align: right" >0.0205s</td>
     </tr>
     <tr>
 		<td>RBM 256</td>
 		<td style="text-align: right" class="danger">46.12%</td>
-		<td style="text-align: right" >17.1725s</td>
-		<td style="text-align: right" >0.0216s</td>
+		<td style="text-align: right" >15.9381s</td>
+		<td style="text-align: right" >0.0226s</td>
     </tr>
     <tr>
 		<td>RBM 512, n_iter=100</td>
 		<td style="text-align: right" class="danger">46.12%</td>
-		<td style="text-align: right" >31.0654s</td>
-		<td style="text-align: right" >0.0415s</td>
+		<td style="text-align: right" >28.2213s</td>
+		<td style="text-align: right" >0.0419s</td>
     </tr>
     <tr>
 		<td>Random Forest</td>
-		<td style="text-align: right" class="danger">46.80%</td>
-		<td style="text-align: right" >3.4770s</td>
-		<td style="text-align: right" >3.0867s</td>
+		<td style="text-align: right" class="danger">38.07%</td>
+		<td style="text-align: right" >4.0751s</td>
+		<td style="text-align: right" >3.0953s</td>
     </tr>
     <tr>
 		<td>Random Forest 2</td>
-		<td style="text-align: right" class="danger">47.96%</td>
-		<td style="text-align: right" >0.1120s</td>
-		<td style="text-align: right" >3.1413s</td>
+		<td style="text-align: right" class="danger">46.25%</td>
+		<td style="text-align: right" >0.1278s</td>
+		<td style="text-align: right" >3.1354s</td>
     </tr>
     <tr>
 		<td>SVM, adj.</td>
-		<td style="text-align: right" class="danger">48.72%</td>
-		<td style="text-align: right" >229.2236s</td>
-		<td style="text-align: right" class="danger">6.5703s</td>
+		<td style="text-align: right" class="danger">46.09%</td>
+		<td style="text-align: right" >187.9059s</td>
+		<td style="text-align: right" class="danger">6.2480s</td>
     </tr>
     <tr>
 		<td>SVM, linear</td>
-		<td style="text-align: right" class="danger">47.86%</td>
-		<td style="text-align: right" >118.8851s</td>
-		<td style="text-align: right" >2.7688s</td>
+		<td style="text-align: right" class="danger">46.12%</td>
+		<td style="text-align: right" >78.1818s</td>
+		<td style="text-align: right" >2.3537s</td>
     </tr>
     <tr>
 		<td>k nn</td>
-		<td style="text-align: right" class="danger">40.46%</td>
-		<td style="text-align: right" >0.0575s</td>
-		<td style="text-align: right" >1.1715s</td>
+		<td style="text-align: right" class="danger">35.54%</td>
+		<td style="text-align: right" >0.0474s</td>
+		<td style="text-align: right" >0.0502s</td>
     </tr>
 </tbody>
 </table>
+
 
