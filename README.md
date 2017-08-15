@@ -1117,7 +1117,7 @@ Accuracy: 0.3875
 
 
 
-
+RESULTS USING KRYSTOF 15 DIM ENCODED TRECHNICALS - NO CNN
 Got 60242 training samples and 3801 test samples.
 ################################################################################
 Start fitting 'Logistic Regression (C=1)' classifier.
