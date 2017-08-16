@@ -1722,6 +1722,390 @@ Accuracy: 0.3310
 </tbody>
 </table>
 
+RESULTS WITH t+5 SAME AS ABOVE
+Got 60242 training samples and 3801 test samples.
+################################################################################
+Start fitting 'Logistic Regression (C=1)' classifier.
+Classifier: Logistic Regression (C=1)
+Training time: 0.6976s
+Testing time: 0.0015s
+Confusion matrix:
+[[ 130    3 1170]
+ [  37    6  678]
+ [ 162    4 1611]]
+Accuracy: 0.4596
+################################################################################
+Start fitting 'Logistic Regression (C=1000)' classifier.
+Classifier: Logistic Regression (C=1000)
+Training time: 0.6896s
+Testing time: 0.0015s
+Confusion matrix:
+[[ 130    3 1170]
+ [  37    6  678]
+ [ 162    4 1611]]
+Accuracy: 0.4596
+################################################################################
+Start fitting 'RBM 200, n_iter=40, LR=0.01, Reg: C=1' classifier.
+[BernoulliRBM] Iteration 1, pseudo-likelihood = -1235.46, time = 1.30s
+[BernoulliRBM] Iteration 2, pseudo-likelihood = -2354.09, time = 2.01s
+[BernoulliRBM] Iteration 3, pseudo-likelihood = -3263.25, time = 1.98s
+[BernoulliRBM] Iteration 4, pseudo-likelihood = -4056.07, time = 1.97s
+[BernoulliRBM] Iteration 5, pseudo-likelihood = -5523.06, time = 1.97s
+[BernoulliRBM] Iteration 6, pseudo-likelihood = -6066.00, time = 1.98s
+[BernoulliRBM] Iteration 7, pseudo-likelihood = -6771.63, time = 2.00s
+[BernoulliRBM] Iteration 8, pseudo-likelihood = -8010.91, time = 2.03s
+[BernoulliRBM] Iteration 9, pseudo-likelihood = -9365.30, time = 2.03s
+[BernoulliRBM] Iteration 10, pseudo-likelihood = -9654.73, time = 2.02s
+[BernoulliRBM] Iteration 11, pseudo-likelihood = -11281.96, time = 2.00s
+[BernoulliRBM] Iteration 12, pseudo-likelihood = -11330.39, time = 1.99s
+[BernoulliRBM] Iteration 13, pseudo-likelihood = -11896.22, time = 1.97s
+[BernoulliRBM] Iteration 14, pseudo-likelihood = -13052.79, time = 1.95s
+[BernoulliRBM] Iteration 15, pseudo-likelihood = -14782.69, time = 1.93s
+[BernoulliRBM] Iteration 16, pseudo-likelihood = -15083.70, time = 1.92s
+[BernoulliRBM] Iteration 17, pseudo-likelihood = -15172.96, time = 1.91s
+[BernoulliRBM] Iteration 18, pseudo-likelihood = -17785.14, time = 1.91s
+[BernoulliRBM] Iteration 19, pseudo-likelihood = -17768.02, time = 1.90s
+[BernoulliRBM] Iteration 20, pseudo-likelihood = -18935.80, time = 1.89s
+[BernoulliRBM] Iteration 21, pseudo-likelihood = -18358.50, time = 1.89s
+[BernoulliRBM] Iteration 22, pseudo-likelihood = -20787.45, time = 1.89s
+[BernoulliRBM] Iteration 23, pseudo-likelihood = -21294.10, time = 1.90s
+[BernoulliRBM] Iteration 24, pseudo-likelihood = -19437.20, time = 1.88s
+[BernoulliRBM] Iteration 25, pseudo-likelihood = -23410.35, time = 1.86s
+[BernoulliRBM] Iteration 26, pseudo-likelihood = -22317.10, time = 1.87s
+[BernoulliRBM] Iteration 27, pseudo-likelihood = -25502.44, time = 1.86s
+[BernoulliRBM] Iteration 28, pseudo-likelihood = -26137.04, time = 1.86s
+[BernoulliRBM] Iteration 29, pseudo-likelihood = -25712.04, time = 1.85s
+[BernoulliRBM] Iteration 30, pseudo-likelihood = -27414.59, time = 1.85s
+[BernoulliRBM] Iteration 31, pseudo-likelihood = -26153.56, time = 1.86s
+[BernoulliRBM] Iteration 32, pseudo-likelihood = -27951.58, time = 1.86s
+[BernoulliRBM] Iteration 33, pseudo-likelihood = -27085.48, time = 1.86s
+[BernoulliRBM] Iteration 34, pseudo-likelihood = -33870.46, time = 1.85s
+[BernoulliRBM] Iteration 35, pseudo-likelihood = -31920.10, time = 1.85s
+[BernoulliRBM] Iteration 36, pseudo-likelihood = -32263.00, time = 1.85s
+[BernoulliRBM] Iteration 37, pseudo-likelihood = -34297.78, time = 1.84s
+[BernoulliRBM] Iteration 38, pseudo-likelihood = -35095.61, time = 1.85s
+[BernoulliRBM] Iteration 39, pseudo-likelihood = -34679.46, time = 1.84s
+[BernoulliRBM] Iteration 40, pseudo-likelihood = -34271.01, time = 1.85s
+Classifier: RBM 200, n_iter=40, LR=0.01, Reg: C=1
+Training time: 78.4014s
+Testing time: 0.0182s
+Confusion matrix:
+[[   1    0 1302]
+ [   1    0  720]
+ [   0    1 1776]]
+Accuracy: 0.4675
+################################################################################
+Start fitting 'RBM 200, n_iter=40, LR=0.01, Reg: C=10000' classifier.
+[BernoulliRBM] Iteration 1, pseudo-likelihood = -1254.82, time = 1.29s
+[BernoulliRBM] Iteration 2, pseudo-likelihood = -2130.59, time = 2.00s
+[BernoulliRBM] Iteration 3, pseudo-likelihood = -3081.18, time = 1.97s
+[BernoulliRBM] Iteration 4, pseudo-likelihood = -4081.51, time = 1.96s
+[BernoulliRBM] Iteration 5, pseudo-likelihood = -4843.31, time = 1.96s
+[BernoulliRBM] Iteration 6, pseudo-likelihood = -5863.44, time = 1.97s
+[BernoulliRBM] Iteration 7, pseudo-likelihood = -6690.57, time = 1.99s
+[BernoulliRBM] Iteration 8, pseudo-likelihood = -7919.46, time = 2.01s
+[BernoulliRBM] Iteration 9, pseudo-likelihood = -8354.72, time = 2.02s
+[BernoulliRBM] Iteration 10, pseudo-likelihood = -9944.81, time = 2.01s
+[BernoulliRBM] Iteration 11, pseudo-likelihood = -10905.20, time = 1.99s
+[BernoulliRBM] Iteration 12, pseudo-likelihood = -12298.76, time = 1.97s
+[BernoulliRBM] Iteration 13, pseudo-likelihood = -12458.20, time = 1.96s
+[BernoulliRBM] Iteration 14, pseudo-likelihood = -12901.44, time = 1.95s
+[BernoulliRBM] Iteration 15, pseudo-likelihood = -13582.56, time = 1.93s
+[BernoulliRBM] Iteration 16, pseudo-likelihood = -14447.47, time = 1.92s
+[BernoulliRBM] Iteration 17, pseudo-likelihood = -16613.38, time = 1.91s
+[BernoulliRBM] Iteration 18, pseudo-likelihood = -16428.64, time = 1.91s
+[BernoulliRBM] Iteration 19, pseudo-likelihood = -17195.36, time = 1.91s
+[BernoulliRBM] Iteration 20, pseudo-likelihood = -19413.36, time = 1.89s
+[BernoulliRBM] Iteration 21, pseudo-likelihood = -18725.95, time = 1.89s
+[BernoulliRBM] Iteration 22, pseudo-likelihood = -21650.00, time = 1.88s
+[BernoulliRBM] Iteration 23, pseudo-likelihood = -21843.38, time = 1.87s
+[BernoulliRBM] Iteration 24, pseudo-likelihood = -21895.69, time = 1.87s
+[BernoulliRBM] Iteration 25, pseudo-likelihood = -22917.61, time = 1.87s
+[BernoulliRBM] Iteration 26, pseudo-likelihood = -25075.95, time = 1.87s
+[BernoulliRBM] Iteration 27, pseudo-likelihood = -23508.46, time = 1.86s
+[BernoulliRBM] Iteration 28, pseudo-likelihood = -26089.48, time = 1.86s
+[BernoulliRBM] Iteration 29, pseudo-likelihood = -26422.37, time = 1.86s
+[BernoulliRBM] Iteration 30, pseudo-likelihood = -27794.79, time = 1.88s
+[BernoulliRBM] Iteration 31, pseudo-likelihood = -28130.33, time = 1.89s
+[BernoulliRBM] Iteration 32, pseudo-likelihood = -29407.81, time = 1.87s
+[BernoulliRBM] Iteration 33, pseudo-likelihood = -30577.42, time = 1.86s
+[BernoulliRBM] Iteration 34, pseudo-likelihood = -30692.23, time = 1.84s
+[BernoulliRBM] Iteration 35, pseudo-likelihood = -33379.00, time = 1.85s
+[BernoulliRBM] Iteration 36, pseudo-likelihood = -33357.14, time = 1.84s
+[BernoulliRBM] Iteration 37, pseudo-likelihood = -34324.49, time = 1.84s
+[BernoulliRBM] Iteration 38, pseudo-likelihood = -33354.15, time = 1.85s
+[BernoulliRBM] Iteration 39, pseudo-likelihood = -35944.84, time = 1.83s
+[BernoulliRBM] Iteration 40, pseudo-likelihood = -36446.93, time = 1.84s
+Classifier: RBM 200, n_iter=40, LR=0.01, Reg: C=10000
+Training time: 78.5947s
+Testing time: 0.0182s
+Confusion matrix:
+[[   1    0 1302]
+ [   1    0  720]
+ [   0    0 1777]]
+Accuracy: 0.4678
+################################################################################
+Start fitting 'RBM 100' classifier.
+Classifier: RBM 100
+Training time: 9.2145s
+Testing time: 0.0106s
+Confusion matrix:
+[[   1    0 1302]
+ [   1    0  720]
+ [   0    0 1777]]
+Accuracy: 0.4678
+################################################################################
+Start fitting 'RBM 100, n_iter=20' classifier.
+Classifier: RBM 100, n_iter=20
+Training time: 17.0407s
+Testing time: 0.0105s
+Confusion matrix:
+[[   0    0 1303]
+ [   2    0  719]
+ [   0    0 1777]]
+Accuracy: 0.4675
+################################################################################
+Start fitting 'RBM 256' classifier.
+Classifier: RBM 256
+Training time: 17.2230s
+Testing time: 0.0217s
+Confusion matrix:
+[[   1    0 1302]
+ [   1    0  720]
+ [   0    0 1777]]
+Accuracy: 0.4678
+################################################################################
+Start fitting 'RBM 512, n_iter=100' classifier.
+Classifier: RBM 512, n_iter=100
+Training time: 30.6307s
+Testing time: 0.0414s
+Confusion matrix:
+[[   0    0 1303]
+ [   0    0  721]
+ [   0    0 1777]]
+Accuracy: 0.4675
+################################################################################
+Start fitting 'SVM, adj.' classifier.
+
+Classifier: SVM, adj.
+Training time: 230.1812s
+Testing time: 7.9364s
+Confusion matrix:
+[[  82    0 1221]
+ [  25    1  695]
+ [  85    1 1691]]
+Accuracy: 0.4667
+################################################################################
+Start fitting 'SVM, linear' classifier.
+Classifier: SVM, linear
+Training time: 94.7755s
+Testing time: 3.3159s
+Confusion matrix:
+[[   0    0 1303]
+ [   0    0  721]
+ [   0    0 1777]]
+Accuracy: 0.4675
+################################################################################
+Start fitting 'k nn' classifier.
+Classifier: k nn
+Training time: 0.0521s
+Testing time: 1.1812s
+Confusion matrix:
+[[652 137 514]
+ [333 128 260]
+ [897 202 678]]
+Accuracy: 0.3836
+################################################################################
+Start fitting 'Decision Tree' classifier.
+Classifier: Decision Tree
+Training time: 0.5814s
+Testing time: 0.0017s
+Confusion matrix:
+[[ 281   38  984]
+ [ 115   69  537]
+ [ 363   42 1372]]
+Accuracy: 0.4530
+################################################################################
+Start fitting 'Random Forest' classifier.
+Classifier: Random Forest
+Training time: 3.6481s
+Testing time: 3.0889s
+Confusion matrix:
+[[536  57 710]
+ [275 110 336]
+ [694 105 978]]
+Accuracy: 0.4273
+################################################################################
+Start fitting 'Random Forest 2' classifier.
+Classifier: Random Forest 2
+Training time: 0.1119s
+Testing time: 3.1255s
+Confusion matrix:
+[[  71   41 1191]
+ [  23   83  615]
+ [ 101   68 1608]]
+Accuracy: 0.4636
+################################################################################
+Start fitting 'AdaBoost' classifier.
+Classifier: AdaBoost
+Training time: 6.7119s
+Testing time: 0.1182s
+Confusion matrix:
+[[ 192   45 1066]
+ [  56   87  578]
+ [ 278   61 1438]]
+Accuracy: 0.4517
+################################################################################
+Start fitting 'Naive Bayes' classifier.
+Classifier: Naive Bayes
+Training time: 0.0156s
+Testing time: 0.0051s
+Confusion matrix:
+[[264 685 354]
+ [ 87 474 160]
+ [340 949 488]]
+Accuracy: 0.3225
+################################################################################
+Start fitting 'LDA' classifier.
+Classifier: LDA
+Training time: 0.0500s
+Testing time: 0.0014s
+Confusion matrix:
+[[ 138    8 1157]
+ [  40   15  666]
+ [ 174    7 1596]]
+Accuracy: 0.4601
+################################################################################
+Start fitting 'QDA' classifier.
+Classifier: QDA
+Training time: 0.0358s
+Testing time: 0.0053s
+Confusion matrix:
+[[ 203  779  321]
+ [  71  519  131]
+ [ 247 1098  432]]
+Accuracy: 0.3036
+<table class="table">
+  <thead>
+    <tr>
+        <th>Classifier</th>
+        <th>Accuracy</th>
+        <th>Training Time</th>
+        <th>Testing Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+		<td>AdaBoost</td>
+		<td style="text-align: right" class="danger">45.17%</td>
+		<td style="text-align: right" >6.7119s</td>
+		<td style="text-align: right" >0.1182s</td>
+    </tr>
+    <tr>
+		<td>Decision Tree</td>
+		<td style="text-align: right" class="danger">45.30%</td>
+		<td style="text-align: right" >0.5814s</td>
+		<td style="text-align: right" >0.0017s</td>
+    </tr>
+    <tr>
+		<td>LDA</td>
+		<td style="text-align: right" class="danger">46.01%</td>
+		<td style="text-align: right" >0.0500s</td>
+		<td style="text-align: right" ><b>0.0014s</b></td>
+    </tr>
+    <tr>
+		<td>Logistic Regression (C=1)</td>
+		<td style="text-align: right" class="danger">45.96%</td>
+		<td style="text-align: right" >0.6976s</td>
+		<td style="text-align: right" >0.0015s</td>
+    </tr>
+    <tr>
+		<td>Logistic Regression (C=1000)</td>
+		<td style="text-align: right" class="danger">45.96%</td>
+		<td style="text-align: right" >0.6896s</td>
+		<td style="text-align: right" >0.0015s</td>
+    </tr>
+    <tr>
+		<td>Naive Bayes</td>
+		<td style="text-align: right" class="danger">32.25%</td>
+		<td style="text-align: right" >0.0156s</td>
+		<td style="text-align: right" >0.0051s</td>
+    </tr>
+    <tr>
+		<td>QDA</td>
+		<td style="text-align: right" class="danger">30.36%</td>
+		<td style="text-align: right" >0.0358s</td>
+		<td style="text-align: right" >0.0053s</td>
+    </tr>
+    <tr>
+		<td>RBM 100</td>
+		<td style="text-align: right" class="danger"><b>46.78%</b></td>
+		<td style="text-align: right" >9.2145s</td>
+		<td style="text-align: right" >0.0106s</td>
+    </tr>
+    <tr>
+		<td>RBM 100, n_iter=20</td>
+		<td style="text-align: right" class="danger">46.75%</td>
+		<td style="text-align: right" >17.0407s</td>
+		<td style="text-align: right" >0.0105s</td>
+    </tr>
+    <tr>
+		<td>RBM 200, n_iter=40, LR=0.01, Reg: C=1</td>
+		<td style="text-align: right" class="danger">46.75%</td>
+		<td style="text-align: right" >78.4014s</td>
+		<td style="text-align: right" >0.0182s</td>
+    </tr>
+    <tr>
+		<td>RBM 200, n_iter=40, LR=0.01, Reg: C=10000</td>
+		<td style="text-align: right" class="danger"><b>46.78%</b></td>
+		<td style="text-align: right" >78.5947s</td>
+		<td style="text-align: right" >0.0182s</td>
+    </tr>
+    <tr>
+		<td>RBM 256</td>
+		<td style="text-align: right" class="danger"><b>46.78%</b></td>
+		<td style="text-align: right" >17.2230s</td>
+		<td style="text-align: right" >0.0217s</td>
+    </tr>
+    <tr>
+		<td>RBM 512, n_iter=100</td>
+		<td style="text-align: right" class="danger">46.75%</td>
+		<td style="text-align: right" >30.6307s</td>
+		<td style="text-align: right" >0.0414s</td>
+    </tr>
+    <tr>
+		<td>Random Forest</td>
+		<td style="text-align: right" class="danger">42.73%</td>
+		<td style="text-align: right" >3.6481s</td>
+		<td style="text-align: right" >3.0889s</td>
+    </tr>
+    <tr>
+		<td>Random Forest 2</td>
+		<td style="text-align: right" class="danger">46.36%</td>
+		<td style="text-align: right" >0.1119s</td>
+		<td style="text-align: right" >3.1255s</td>
+    </tr>
+    <tr>
+		<td>SVM, adj.</td>
+		<td style="text-align: right" class="danger">46.67%</td>
+		<td style="text-align: right" >230.1812s</td>
+		<td style="text-align: right" class="danger">7.9364s</td>
+    </tr>
+    <tr>
+		<td>SVM, linear</td>
+		<td style="text-align: right" class="danger">46.75%</td>
+		<td style="text-align: right" >94.7755s</td>
+		<td style="text-align: right" >3.3159s</td>
+    </tr>
+    <tr>
+		<td>k nn</td>
+		<td style="text-align: right" class="danger">38.36%</td>
+		<td style="text-align: right" >0.0521s</td>
+		<td style="text-align: right" >1.1812s</td>
+    </tr>
+</tbody>
+</table>
+
 
 RESULTS USING KRYSTOF 15 DIM ENCODED TRECHNICALS - NO CNN
 Got 60242 training samples and 3801 test samples.
