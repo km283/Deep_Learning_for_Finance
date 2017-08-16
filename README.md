@@ -2327,7 +2327,7 @@ Accuracy: 0.4425
 </tbody>
 </table>
 
-RESULTS USING AVERAGE HEADLINES CONCETENATED WITH RNN 20 DIM ENCODINGS 
+RESULTS USING MEAN SQUARED ERROR 400 dim HEADLINES CONCETENATED WITH RNN 20 DIM ENCODINGS 
 Got 60242 training samples and 3801 test samples.
 ################################################################################
 Start fitting 'Logistic Regression (C=1)' classifier.
