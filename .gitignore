@@ -1,0 +1,13 @@
+glove/*.txt
+glove/glv
+glove/__pycache__
+glove/*.csv
+lectures
+./s2s/MTEnc.py
+./s2s/ckpt.py
+./s2s/ckpt2.py
+./s2s/GoogleSeq2Seq
+./s2s/summary
+./s2s/daysummary
+./s2s/dayencoder
+./s2s/__pycache__

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Deep_Learning_for_Finance
 MOST COMMON NEURAL NETWORK BUILDING BLOCKS DESCRIBED BELOW 
 - Image summary available at: http://nyc2016.fpq.io/fpq_yam_peleg_deep_learning.pdf   page12
@@ -4457,3 +4458,7 @@ Accuracy: 0.4701
     </tr>
 </tbody>
 </table>
+=======
+# ComputationalInvesting
+Using state of the art Deep learning models for Stock Market Predictions.
+>>>>>>> Code/rnnencode
