@@ -1,8 +1,0 @@
-POST ANY COMMENTS ABOUT THE WORK, MEETUPS & ETC HERE AS WELL AS FACEBOOK
-- Michael you are absolutely write about the loss function thing. I only put down softmax becuase I couldn't remember the acronim used in the deep learning book. 
-- MEETUP SUGGESTION: Sunday 9th from 3pm to 12pm 
-
-7/6
--Added technicals explanation to READ_ME... will add more today if need be after some rest 
--Added old paper to facilitate technical explanation
--Will write BLOOMBERG email for tmrw 
