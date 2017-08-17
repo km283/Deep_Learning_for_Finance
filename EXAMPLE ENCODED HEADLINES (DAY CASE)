@@ -1,0 +1,31 @@
+SIMILARLY ENCODE HEADLINES
+CASE 1
+
+Ticker	JPM
+Date	20170109
+Headline	Indonesia bars JPMorgan from next dollar sukuk issuance: official , JPMorgan's Dimon says strong economy will speed interest rate hikes , JPMorgan's Dimon says strong economy will speed interest rate hikes , UPDATE 1-Bitcoin exchange operator pleads guilty in U.S. case tied to JPMorgan hack , UPDATE 2-Indonesia bars JPMorgan from next dollar sukuk issuance - official
+
+Ticker	FOXA
+Date	20160908
+Headline	FCC chair unveils revised set top box reform plan , Liberty takeover offers a longer-term vision for F1 , Liberty will not 'Americanise' F1 says Carey , Motor racing-Liberty will not 'Americanise' F1 says Carey , RPT-UPDATE 1-Motor racing-Formula One faces big shake-up after Liberty deal , RPT-UPDATE 1-Motor racing-Formula One faces big shake-up after Liberty deal
+
+
+
+CASE 2
+Ticker	DB
+Date	20160818
+Headline	Deutsche Bank whistleblower rebuffs $8.25 million SEC award -FT , Deutsche Bank whistleblower rebuffs $8.25 million SEC award: FT , UPDATE 1-Deutsche Bank whistleblower rebuffs $8.25 mln SEC award -FT , U.S. says Deutsche Bank to appoint swaps monitor after April outage , U.S. says Deutsche Bank to appoint swaps monitor after April outage , U.S. says Deutsche Bank to appoint swaps monitor after April outage
+T1	Hold
+T2	SELL
+T3	BUY
+
+Ticker	JPM
+Date	20161118
+Headline	Ex-JPMorgan executive who fled to Argentina pleads guilty in U.S. , Ex-JPMorgan executive who fled to Argentina pleads guilty in U.S. , Ex-JPMorgan executive who fled to Argentina pleads guilty in U.S. , JPMorgan has clutch of CEO understudies people guessing on winner , JPMorgan has clutch of CEO understudies people guessing on winner
+T1	NA
+T2	NA
+T3	NA
+
+
+CASE 
+
