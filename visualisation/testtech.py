@@ -12,21 +12,23 @@ from utils.helper import CSVParser
 
 
 # VFILE = "/cs/home/un4/Documents/Dissertation/Data/mthenc_val.csv"
-# VFILE = "/cs/home/un4/Documents/Dissertation/Data/tech_enc_test.csv"
-# VFILE = "/cs/home/un4/Documents/Dissertation/Data/mthenc_val.csv"
+# VFILE = "/cs/home/un4/Documents/Dissertation/Data/tech_enc_val.csv"
+# VFILE = "/cs/home/un4/Documents/Dissertation/Data/MTEnc/mthenc_val.csv"
 # VFILE = "/cs/home/un4/Documents/Dissertation/Data/NewMT/mt_henc_val.csv"
 
+# VFILE = "/cs/home/un4/Documents/Dissertation/Data/avg_val.csv"
 VFILE = "/cs/home/un4/Documents/Dissertation/Data/mtd_val.csv"
+# VFILE = "/cs/home/un4/Documents/Krystof_Folder/cnn_encoded_tech_norm.csv"
 
 def main(news, tech):
     # vfile = genfromtxt(VFILE, delimiter=",")
     items = []
-    path =os.path.join("vis/emb", "metadata.tsv")
+    path = os.path.join("vis/emb", "metadata.tsv")
     print(path)
 
     with open(VFILE, "r") as vf:
         meta_file = open(path, "w")
-        meta_file.write("Ticker\tDate\tHeadline\tY\n")
+        meta_file.write("Ticker\tDate\tHeadline\tT1\tT2\tT3\n")
         for item in vf:
             line = item.split(",")
             # ticker = line[0]
@@ -36,18 +38,24 @@ def main(news, tech):
             # print(ticker)
 
             headlines = news.get(ticker).get(date, ["None"])
+
             buy = tech.get(ticker, None)
-
             if buy == None:
-                buy = "NA"
+                buy = "NA\tNA\tNA"
             else:
-                buy = buy.get(date, "None")
-            headline = ", ".join(headlines)
+                buy = buy.get(date, None)
+                if buy == None:
+                    buy = "NA\tNA\tNA"
+                else:
+                    buy = "\t".join(buy)
 
+            headline = ", ".join(headlines)
             vectors = line[2].split()
+            # vectors = line[2:]
 
             items.append(vectors)
-            meta_file.write("{}\t{}\t{}\t{}\n".format(ticker, date, headline, buy))
+            values = "{}\t{}\t{}\t{}\n".format(ticker, date, headline, buy)
+            meta_file.write(values)
         meta_file.close()
     # df = pd.read_table(VFILE, sep=" ", engine="python", header = None)
     myarr = np.array(items).astype(np.float32)
@@ -81,6 +89,9 @@ def read_news(news):
             date = values[2]
             ticker = values[0]
             headline = values[3]
+            if headline == "":
+                continue
+            headline = headline.replace("\t", " ")
             date_ticker = date_dict.get(ticker, None)
             if date_ticker == None:
                 date_dict[ticker] = {date: []}
@@ -110,9 +121,12 @@ def read_tech(tech):
             values = CSVParser.parse(items)
             date = values[1]
             ticker = values[0]
-            buy = values[5]
-            # hold = values[9]
-            # sell = values[13]
+
+            t = []
+            t.append(values[5])
+            t.append(values[9])
+            t.append(values[13])
+
             date_ticker = date_dict.get(ticker, None)
             if date_ticker == None:
                 date_dict[ticker] = {date: ""}
@@ -120,13 +134,13 @@ def read_tech(tech):
                 date_ticker_vector = date_ticker.get(date, None)
                 if date_ticker_vector == None:
                     date_dict[ticker][date] = ""
-            date_dict[ticker][date] = option(buy)
+            date_dict[ticker][date] = list(map(option, t))
     return date_dict
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
     news = "/cs/home/un4/Documents/Dissertation/Data/news_reuters.csv"
-    tech = "/cs/home/un4/Documents/Krystof_Folder/r.csv"
+    tech = "/cs/home/un4/Documents/Krystof_Folder/r2.csv"
     newsdf  = read_news(news)
     techdf = read_tech(tech)
     # print(list(newsdf.keys()))
